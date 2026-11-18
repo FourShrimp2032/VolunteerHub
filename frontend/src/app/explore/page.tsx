@@ -112,7 +112,7 @@ function Explore() {
         </Button>
       </form>
 
-      <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+      <div className="no-scrollbar -mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
         <Chip active={!params.category} onClick={() => set({ category: "" })}>Усі категорії</Chip>
         {CATEGORIES.map((c) => (
           <Chip key={c.slug} active={params.category === c.slug} onClick={() => set({ category: params.category === c.slug ? "" : c.slug })}>
@@ -186,8 +186,8 @@ function Chip({ active, children, onClick }: { active: boolean; children: React.
     <button
       onClick={onClick}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition",
-        active ? "border-fg bg-fg text-white" : "border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg",
+        "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition",
+        active ? "border-accent-border bg-accent-soft text-accent" : "border-border bg-surface text-fg-muted shadow-card hover:border-border-strong hover:text-fg",
       )}
     >
       {children}

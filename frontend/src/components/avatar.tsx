@@ -21,7 +21,7 @@ export function Avatar({ name, src, size = 36, className }: { name: string; src?
   return (
     <span
       className={cn("grid shrink-0 place-items-center rounded-full font-display font-semibold text-white ring-1 ring-black/5", className)}
-      style={{ width: size, height: size, fontSize: size * 0.38, background: `linear-gradient(135deg, oklch(0.68 0.13 ${hue}), oklch(0.5 0.15 ${(hue + 40) % 360}))` }}
+      style={{ width: size, height: size, fontSize: size * 0.38, background: `linear-gradient(160deg, oklch(0.66 0.1 ${hue}), oklch(0.5 0.12 ${(hue + 30) % 360}))` }}
       aria-label={name}
     >
       {initials || "?"}

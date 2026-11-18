@@ -25,7 +25,7 @@ export default function OrganizerPage() {
   return (
     <div className="container-page pt-8 sm:pt-12">
       <Card className="relative overflow-hidden p-6 sm:p-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-accent-soft via-subtle to-gold-soft" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 border-b border-border bg-subtle"><div className="h-full bg-grid [mask-image:linear-gradient(to_bottom,black,transparent)]" /></div>
         <div className="relative flex flex-col gap-6 pt-6 md:flex-row md:items-end md:justify-between">
           <div className="flex items-end gap-5">
             <Avatar name={o.name} src={o.avatarUrl} size={96} className="ring-4 ring-surface" />
@@ -67,7 +67,7 @@ export default function OrganizerPage() {
 function Mini({ v, l, icon }: { v: number; l: string; icon?: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-subtle p-4">
-      <p className="flex items-center gap-2 font-display text-2xl font-bold">{v} {icon}</p>
+      <p className="flex items-center gap-2 font-heading text-2xl font-extrabold tracking-tight">{v} {icon}</p>
       <p className="text-[13px] text-fg-muted">{l}</p>
     </div>
   );
