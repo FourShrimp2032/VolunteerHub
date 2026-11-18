@@ -2,12 +2,14 @@ name: CI & Deploy
 
 on:
   push:
-    branches: [main, "claude/**"]
+    branches: [main, "claude/**", "redesign/**"]
   pull_request:
   workflow_dispatch:
 
+# Runs that can deploy (main pushes, manual runs) share one "production" lock, so a
+# deploy + smoke test finishes before the next one starts. Other runs only test.
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch') && 'production' || format('ci-{0}', github.ref) }}
   cancel-in-progress: false
 
 jobs:
@@ -31,8 +33,9 @@ jobs:
           retention-days: 3
 
   deploy:
-    # Deploys the single production Worker. Runs on pushes (not on PRs from forks).
-    if: github.event_name != 'pull_request'
+    # Deploys the single production Worker. Only main deploys automatically;
+    # feature branches run tests only (a manual "Run workflow" can deploy one).
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     needs: test
     runs-on: ubuntu-latest
     env:
