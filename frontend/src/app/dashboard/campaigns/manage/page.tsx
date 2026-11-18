@@ -111,7 +111,7 @@ function Manage({ id }: { id: string }) {
 
       {live && stats && (
         <section>
-          <h2 className="mb-4 text-lg font-medium">Статистика</h2>
+          <h2 className="mb-4 text-lg font-bold">Статистика</h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
             <StatTile icon={<Eye />} value={num(stats.totals.views)} label="Переглядів" hint="Унікальних за день" />
             <StatTile icon={<Users />} value={stats.totals.followers} label="Підписників" />
@@ -141,7 +141,7 @@ function Manage({ id }: { id: string }) {
       )}
 
       <section>
-        <h2 className="mb-4 text-lg font-medium">Опубліковані оновлення</h2>
+        <h2 className="mb-4 text-lg font-bold">Опубліковані оновлення</h2>
         {c.updates.length === 0 ? (
           <p className="text-sm text-fg-muted">Поки немає оновлень.</p>
         ) : (

@@ -102,7 +102,7 @@ export default function CampaignPage() {
             {c.city && <Badge tone="outline"><MapPin /> {c.city}</Badge>}
             {c.isDemo && <Badge tone="dark">Демо</Badge>}
           </div>
-          <h1 className="mt-4 text-balance text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">{c.title}</h1>
+          <h1 className="mt-4 text-balance text-[28px] font-bold leading-tight tracking-tight sm:text-4xl">{c.title}</h1>
           {c.summary && <p className="mt-3 text-[17px] leading-relaxed text-fg-muted">{c.summary}</p>}
           <div className="mt-4"><VerificationBadges v={c.verification} /></div>
 
@@ -205,7 +205,7 @@ export default function CampaignPage() {
 function Section({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
   return (
     <section className="mt-12">
-      <h2 className="mb-5 flex items-center gap-2 text-xl font-medium tracking-tight">
+      <h2 className="mb-5 flex items-center gap-2 text-xl font-bold tracking-tight">
         {title}
         {count !== undefined && count > 0 && <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-fg-muted">{count}</span>}
       </h2>
@@ -246,7 +246,7 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
   return (
     <Card className="p-5 sm:p-6">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="font-display text-[28px] font-bold tabular-nums tracking-tight">{money(c.raisedAmount)}</p>
+        <p className="font-heading text-[30px] font-extrabold tabular-nums tracking-[-0.035em]">{money(c.raisedAmount)}</p>
         <p className="text-sm text-fg-muted">{pct(c.progress)}</p>
       </div>
       <p className="mt-0.5 text-sm text-fg-muted">зібрано з {money(c.goalAmount)}</p>
@@ -286,7 +286,7 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
         </div>
         {isPublic && <SharePanel c={c} referralCode={viewer.referralCode} />}
         {(viewer.isOwner || viewer.isAdmin) && (
-          <ButtonLink href={`/dashboard/campaigns/manage?id=${c.id}`} variant="dark" className="mt-1">
+          <ButtonLink href={`/dashboard/campaigns/manage?id=${c.id}`} variant="secondary" className="mt-1">
             <Pencil /> Керувати збором
           </ButtonLink>
         )}
@@ -297,8 +297,8 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
 
 function Stat({ v, l }: { v: React.ReactNode; l: string }) {
   return (
-    <div className="rounded-xl bg-subtle px-2 py-2.5">
-      <p className="font-display text-[17px] font-bold tabular-nums">{v}</p>
+    <div className="rounded-lg border border-border bg-subtle px-2 py-2.5">
+      <p className="font-heading text-[17px] font-bold tabular-nums tracking-tight">{v}</p>
       <p className="truncate text-[11px] text-fg-subtle">{l}</p>
     </div>
   );

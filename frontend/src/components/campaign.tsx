@@ -24,21 +24,21 @@ export function CampaignCover({ campaign, className, iconSize = 34 }: { campaign
     <div
       className={cn("relative h-full w-full overflow-hidden", className)}
       style={{
-        background: `radial-gradient(90% 120% at ${10 + (seed % 50)}% 0%, oklch(0.93 0.06 ${h}) 0%, transparent 70%), oklch(0.86 0.08 ${h})`,
+        background: `radial-gradient(120% 100% at ${15 + (seed % 60)}% 0%, oklch(0.985 0.012 ${h}) 0%, transparent 65%), linear-gradient(160deg, oklch(0.955 0.025 ${h}), oklch(0.925 0.04 ${h}))`,
       }}
       aria-hidden
     >
-      <div className="bg-hatch absolute inset-0 opacity-[0.07]" style={{ color: `oklch(0.3 0.08 ${h})` }} />
+      <div className="bg-dots absolute inset-0 opacity-[0.16] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" style={{ color: `oklch(0.45 0.06 ${h})` }} />
       <Icon
         className="absolute"
-        strokeWidth={1.1}
-        style={{ width: big, height: big, right: -big * 0.14, bottom: -big * 0.22, color: `oklch(0.42 0.1 ${h})`, opacity: 0.28, transform: `rotate(${(seed % 24) - 12}deg)` }}
+        strokeWidth={0.9}
+        style={{ width: big, height: big, right: -big * 0.12, bottom: -big * 0.24, color: `oklch(0.5 0.09 ${h})`, opacity: 0.22, transform: `rotate(${(seed % 20) - 10}deg)` }}
       />
       <span
-        className="absolute bottom-3 left-3 grid place-items-center rounded-xl bg-white/85 p-2 shadow-card backdrop-blur"
-        style={{ color: `oklch(0.42 0.12 ${h})` }}
+        className="absolute bottom-3 left-3 grid place-items-center rounded-lg bg-white p-2 shadow-[0_1px_2px_oklch(0.2_0.02_260/0.08),0_0_0_1px_oklch(0.2_0.02_260/0.06)]"
+        style={{ color: `oklch(0.45 0.12 ${h})` }}
       >
-        <Icon style={{ width: iconSize * 0.62, height: iconSize * 0.62 }} strokeWidth={1.8} />
+        <Icon style={{ width: iconSize * 0.58, height: iconSize * 0.58 }} strokeWidth={1.8} />
       </span>
     </div>
   );
@@ -94,22 +94,22 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
     <Link
       href={`/campaigns/${c.slug}`}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lift",
+        "group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lift",
         className,
       )}
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-muted">
-        <CampaignCover campaign={c} className="transition duration-500 group-hover:scale-[1.03]" />
+      <div className="relative aspect-[16/9] overflow-hidden border-b border-border bg-muted">
+        <CampaignCover campaign={c} className="transition duration-500 ease-out group-hover:scale-[1.025]" />
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           {c.urgent && c.status === "active" && (
-            <Badge tone="danger" className="border-transparent bg-danger text-white">
+            <Badge tone="danger" className="border-transparent bg-danger text-white shadow-sm">
               <Flame /> Терміново
             </Badge>
           )}
           {c.status !== "active" && status && <Badge tone={status.tone}>{status.label}</Badge>}
         </div>
         {c.isDemo && (
-          <Badge tone="outline" className="absolute right-3 top-3 border-transparent bg-white/85 text-fg-muted backdrop-blur">
+          <Badge tone="outline" className="absolute right-3 top-3 border-border bg-white/90 text-fg-muted backdrop-blur">
             Демо
           </Badge>
         )}
@@ -126,19 +126,19 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
           )}
           {c.reasons && c.reasons.length > 0 && <span className="text-accent">{c.reasons[0]}</span>}
         </p>
-        <h3 className="line-clamp-2 text-[16.5px] font-bold leading-snug text-fg transition-colors group-hover:text-accent">{c.title}</h3>
+        <h3 className="line-clamp-2 text-[16px] font-bold leading-snug text-fg transition-colors group-hover:text-accent">{c.title}</h3>
         <p className="mt-1.5 line-clamp-2 text-[13.5px] leading-relaxed text-fg-muted">{c.summary}</p>
         <div className="mt-auto pt-5">
           <div className="mb-2 flex items-baseline justify-between gap-2">
-            <span className="text-[17px] font-bold tabular-nums tracking-tight">
+            <span className="font-heading text-[17px] font-bold tabular-nums tracking-[-0.02em]">
               {money(c.raisedAmount)}
               <span className="ml-1.5 text-[12px] font-normal text-fg-subtle">з {money(c.goalAmount)}</span>
             </span>
             <span className={cn("text-[13px] font-semibold tabular-nums", c.progress >= 1 ? "text-success" : "text-accent")}>{pct(c.progress)}</span>
           </div>
-          <Progress value={c.progress} tone={c.progress >= 1 ? "success" : "accent"} />
+          <Progress value={c.progress} tone={c.progress >= 1 ? "success" : "accent"} label={`Зібрано ${pct(c.progress)}`} />
         </div>
-        <div className="mt-4 flex items-center justify-between gap-3 text-[12px] text-fg-subtle">
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3.5 text-[12px] text-fg-subtle">
           {c.organizer ? (
             <span className="flex min-w-0 items-center gap-2">
               <Avatar name={c.organizer.name} src={c.organizer.avatarUrl} size={22} />
@@ -166,7 +166,7 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
 
 export function CampaignCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+    <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
       <Skeleton className="aspect-[16/9] rounded-none" />
       <div className="space-y-3 p-5">
         <Skeleton className="h-4 w-3/4" />
@@ -221,15 +221,13 @@ export function CampaignRow({ items, loading }: { items?: Card[] | null; loading
 
 export function SectionHeader({ eyebrow, title, description, action }: { eyebrow?: React.ReactNode; title: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
         {eyebrow && (
-          <p className="mb-3 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
-            <span className="h-2 w-2 rounded-full bg-sun ring-2 ring-sun/30" /> {eyebrow}
-          </p>
+          <p className="mb-2.5 text-[13px] font-semibold text-accent">{eyebrow}</p>
         )}
-        <h2 className="text-balance text-[24px] leading-tight sm:text-[30px]">{title}</h2>
-        {description && <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{description}</p>}
+        <h2 className="text-balance text-[26px] leading-[1.15] sm:text-[32px]">{title}</h2>
+        {description && <p className="mt-3 text-[15.5px] leading-relaxed text-fg-muted">{description}</p>}
       </div>
       {action}
     </div>
@@ -238,8 +236,8 @@ export function SectionHeader({ eyebrow, title, description, action }: { eyebrow
 
 export function EmptyState({ icon, title, description, action }: { icon?: React.ReactNode; title: string; description?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-dashed border-border-strong bg-surface/60 px-6 py-12 text-center">
-      {icon && <div className="mb-4 grid size-12 place-items-center rounded-2xl bg-surface text-fg-muted shadow-card [&_svg]:size-5">{icon}</div>}
+    <div className="flex flex-col items-center rounded-2xl border border-dashed border-border-strong bg-surface px-6 py-14 text-center">
+      {icon && <div className="mb-4 grid size-11 place-items-center rounded-xl border border-border bg-subtle text-fg-muted [&_svg]:size-5">{icon}</div>}
       <p className="font-heading text-[16px] font-bold">{title}</p>
       {description && <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-fg-muted">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
