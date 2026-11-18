@@ -330,5 +330,11 @@ export const contentReports = sqliteTable("content_reports", {
   createdAt: integer("created_at").notNull().default(now),
 });
 
+/** Small key/value store for app-generated settings (e.g. a random visitor salt). */
+export const appSettings = sqliteTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;

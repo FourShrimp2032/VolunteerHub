@@ -1,0 +1,6 @@
+{
+  "name": "volunteerhub-e2e",
+  "private": true,
+  "scripts": { "smoke": "node smoke.cjs" },
+  "dependencies": { "playwright": "1.65.1" }
+}

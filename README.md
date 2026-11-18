@@ -4,7 +4,7 @@
 
 > Mission: make every important fundraiser visible, trustworthy and accessible, regardless of who started it.
 
-🌐 **Live prototype:** https://volunteerhub.__SUBDOMAIN__.workers.dev (see [Deployed prototype](#12-deployed-prototype))
+🌐 **Live prototype:** https://volunteerhub.ivan-antonenko.workers.dev (see [Deployed prototype](#12-deployed-prototype))
 
 ---
 
@@ -188,8 +188,9 @@ bash infra/scripts/deploy.sh
 
 ## 12. Deployed prototype
 
-- **URL:** https://volunteerhub.__SUBDOMAIN__.workers.dev
+- **URL:** https://volunteerhub.ivan-antonenko.workers.dev
 - **Health check:** `/api/health` (shows that the database is connected)
+- The live deployment is checked on every push by the `smoke-test` job in GitHub Actions (`infra/e2e/smoke.cjs`): it registers, creates a campaign through the wizard, approves it as admin, follows it as another user, logs out, then deletes its test data.
 - Register a new account to try the organizer and supporter flows. Campaigns you create appear publicly after an admin approves them in `/admin`.
 
 ## What is not connected yet (by design)

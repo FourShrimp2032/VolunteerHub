@@ -4,6 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { getDb, type DB } from "../db/client";
 import {
+  appSettings,
   budgetItems,
   campaignAttachments,
   campaignUpdates,
@@ -26,7 +27,7 @@ import { buildSections, progressOf } from "../lib/discovery";
 import { awardXp, evaluateProgress } from "../lib/gamification";
 import { parseJarUrl } from "../lib/monobank";
 import { campaignCards, fileUrl, loadCampaignBySlugOrId, publicUser, toCard, verificationOf } from "../lib/serialize";
-import { dayKey, newId, parseJsonArray, sha256Hex, slugify } from "../lib/util";
+import { dayKey, newId, parseJsonArray, randomToken, sha256Hex, slugify } from "../lib/util";
 import { body } from "../lib/validate";
 
 const budgetSchema = z.array(z.object({ label: z.string().trim().min(1, "Вкажіть назву статті бюджету").max(120), amount: z.number().int().min(0).max(1_000_000_000) })).max(30);
@@ -47,10 +48,22 @@ const draftSchema = z.object({
 
 const EDITABLE_STATUSES = new Set(["draft", "rejected", "pending", "active", "goal_reached"]);
 
-async function visitorHash(c: Context<AppEnv>) {
+let cachedSalt: string | null = null;
+/** VISITOR_SALT secret, or a random salt generated once and kept in the database. */
+async function visitorSalt(c: Context<AppEnv>, db: DB) {
+  if (c.env.VISITOR_SALT) return c.env.VISITOR_SALT;
+  if (cachedSalt) return cachedSalt;
+  await db.insert(appSettings).values({ key: "visitor_salt", value: randomToken(24) }).onConflictDoNothing();
+  const [row] = await db.select().from(appSettings).where(eq(appSettings.key, "visitor_salt"));
+  cachedSalt = row.value;
+  return cachedSalt;
+}
+
+/** Anonymous visitor fingerprint: salted hash of IP + user agent. Raw IPs are never stored. */
+async function visitorHash(c: Context<AppEnv>, db: DB) {
   const ip = c.req.header("cf-connecting-ip") ?? "local";
   const ua = c.req.header("user-agent") ?? "";
-  return sha256Hex(`${c.env.VISITOR_SALT ?? "vh-dev-salt"}|${ip}|${ua}`);
+  return sha256Hex(`${await visitorSalt(c, db)}|${ip}|${ua}`);
 }
 
 function canView(c: Campaign, user: User | null) {
@@ -302,7 +315,7 @@ export const campaignRoutes = new Hono<AppEnv>()
     const raw = (await c.req.json().catch(() => ({}))) as { ref?: unknown };
     const ref = typeof raw.ref === "string" ? raw.ref.slice(0, 20) : null;
     const user = c.get("user");
-    const vh = await visitorHash(c);
+    const vh = await visitorHash(c, db);
     let referrer: string | null = null;
     if (ref) {
       const [r] = await db.select({ id: users.id }).from(users).where(eq(users.referralCode, ref)).limit(1);

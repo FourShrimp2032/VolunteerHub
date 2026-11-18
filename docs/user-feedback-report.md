@@ -9,7 +9,7 @@
 
 ### A1. Test setup
 
-- Prototype URL: `https://volunteerhub.<subdomain>.workers.dev`
+- Prototype URL: `https://volunteerhub.ivan-antonenko.workers.dev`
 - Session length: 30–40 minutes, moderated (in person or video call), screen shared
 - Device mix: aim for at least 50% of sessions on a phone
 - Ask for consent to take notes and, optionally, record the screen. Store recordings privately.
