@@ -180,7 +180,7 @@ export function Leaderboard({ rows, unit = "XP цього місяця", highlig
   if (!rows.length) return <p className="py-6 text-center text-sm text-fg-muted">Поки що порожньо. Станьте першими!</p>;
   const max = Math.max(1, ...rows.map((r) => r.xp));
   return (
-    <ol className="grid gap-1">
+    <ol className="grid grid-cols-1 gap-1">
       {rows.map((r, i) => (
         <li key={r.id} className={cn("flex items-center gap-3 rounded-xl px-2 py-2.5", r.id === highlightId && "bg-accent-soft")}>
           <span className={cn("grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold", i === 0 ? "bg-gold text-white" : i === 1 ? "bg-[oklch(0.82_0.01_260)] text-white" : i === 2 ? "bg-[oklch(0.72_0.08_50)] text-white" : "bg-muted text-fg-muted")}>

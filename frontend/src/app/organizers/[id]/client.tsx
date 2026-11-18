@@ -30,7 +30,7 @@ export default function OrganizerPage() {
           <div className="flex items-end gap-5">
             <Avatar name={o.name} src={o.avatarUrl} size={96} className="ring-4 ring-surface" />
             <div className="min-w-0 pb-1">
-              <h1 className="flex flex-wrap items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+              <h1 className="flex flex-wrap items-center gap-2 text-2xl font-medium tracking-tight sm:text-3xl">
                 {o.name} {o.identityVerified && <BadgeCheck className="size-6 text-accent" aria-label="Особу перевірено" />}
               </h1>
               <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-fg-muted">
@@ -57,7 +57,7 @@ export default function OrganizerPage() {
         </div>
       </Card>
       <section className="mt-12">
-        <h2 className="mb-5 flex items-center gap-2 text-xl font-bold"><Users className="size-5" /> Збори організатора</h2>
+        <h2 className="mb-5 flex items-center gap-2 text-xl font-medium"><Users className="size-5" /> Збори організатора</h2>
         <CampaignGrid items={d.campaigns} empty={<EmptyState title="Публічних зборів поки немає" />} />
       </section>
     </div>

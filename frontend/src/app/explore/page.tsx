@@ -90,7 +90,7 @@ function Explore() {
   return (
     <div className="container-page pt-8 sm:pt-12">
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Знайдіть збір, якому потрібна ваша допомога</h1>
+        <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Знайдіть збір, якому потрібна ваша допомога</h1>
         <p className="mt-3 text-fg-muted">«Рекомендовані» враховують новизну, малу кількість переглядів, перевірки, терміновість і близькість до цілі. Не лише популярність.</p>
       </div>
 
@@ -112,7 +112,7 @@ function Explore() {
         </Button>
       </form>
 
-      <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+      <div className="no-scrollbar -mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
         <Chip active={!params.category} onClick={() => set({ category: "" })}>Усі категорії</Chip>
         {CATEGORIES.map((c) => (
           <Chip key={c.slug} active={params.category === c.slug} onClick={() => set({ category: params.category === c.slug ? "" : c.slug })}>
@@ -187,7 +187,7 @@ function Chip({ active, children, onClick }: { active: boolean; children: React.
       onClick={onClick}
       className={cn(
         "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition",
-        active ? "border-fg bg-fg text-white" : "border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg",
+        active ? "border-ink bg-ink text-white" : "border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg",
       )}
     >
       {children}

@@ -11,12 +11,13 @@ import { cn } from "@/lib/cn";
 import { Loader2 } from "lucide-react";
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-accent text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_1px_2px_oklch(0.4_0.2_263/0.35)] hover:bg-accent-hover",
-        dark: "bg-fg text-white hover:bg-fg/90 shadow-sm",
+        primary: "bg-accent text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.16),0_1px_2px_oklch(0.35_0.15_260/0.35)] hover:bg-accent-hover",
+        sun: "bg-sun text-ink hover:bg-[oklch(0.83_0.165_90)] shadow-[inset_0_-1px_0_oklch(0.3_0.08_75/0.15)]",
+        dark: "bg-ink text-white hover:bg-ink/90 shadow-sm",
         secondary: "bg-surface text-fg border border-border hover:border-border-strong hover:bg-subtle shadow-card",
         ghost: "text-fg-muted hover:text-fg hover:bg-muted",
         soft: "bg-accent-soft text-accent hover:bg-accent-soft/70",
@@ -154,7 +155,6 @@ export function Progress({ value, className, tone = "accent", size = "md" }: { v
   return (
     <div className={cn("relative w-full overflow-hidden rounded-full bg-muted", h, className)} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
       <div className={cn("h-full rounded-full transition-[width] duration-700 ease-out", fill)} style={{ width: `${pct}%` }}>
-        <div className="h-full w-full rounded-full bg-gradient-to-r from-white/0 via-white/25 to-white/0" />
       </div>
     </div>
   );

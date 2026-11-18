@@ -102,7 +102,7 @@ export default function CampaignPage() {
             {c.city && <Badge tone="outline"><MapPin /> {c.city}</Badge>}
             {c.isDemo && <Badge tone="dark">Демо</Badge>}
           </div>
-          <h1 className="mt-4 text-balance text-[28px] font-bold leading-tight tracking-tight sm:text-4xl">{c.title}</h1>
+          <h1 className="mt-4 text-balance text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">{c.title}</h1>
           {c.summary && <p className="mt-3 text-[17px] leading-relaxed text-fg-muted">{c.summary}</p>}
           <div className="mt-4"><VerificationBadges v={c.verification} /></div>
 
@@ -205,7 +205,7 @@ export default function CampaignPage() {
 function Section({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
   return (
     <section className="mt-12">
-      <h2 className="mb-5 flex items-center gap-2 text-xl font-bold tracking-tight">
+      <h2 className="mb-5 flex items-center gap-2 text-xl font-medium tracking-tight">
         {title}
         {count !== undefined && count > 0 && <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-fg-muted">{count}</span>}
       </h2>

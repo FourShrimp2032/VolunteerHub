@@ -48,12 +48,12 @@ export function SiteHeader() {
         <Link href="/" className="shrink-0" aria-label="Volunteerhub — на головну">
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {NAV.map((n) => (
             <Link
               key={n.href}
               href={n.href}
-              className={cn("rounded-lg px-3 py-1.5 text-sm transition", pathname.startsWith(n.href) ? "text-fg font-medium" : "text-fg-muted hover:text-fg")}
+              className={cn("rounded-full px-3.5 py-1.5 text-sm font-medium transition", pathname.startsWith(n.href) ? "bg-surface text-fg shadow-[0_0_0_1px_var(--color-border)]" : "text-fg-muted hover:text-fg")}
             >
               {n.label}
             </Link>
@@ -114,7 +114,7 @@ export function SiteHeader() {
         <div className="container-page animate-fade-up pb-5 lg:hidden">
           <nav className="grid gap-1">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="rounded-xl px-3 py-2.5 text-[15px] text-fg hover:bg-muted">
+              <Link key={n.href} href={n.href} className={cn("rounded-xl px-3 py-2.5 text-[15px] font-medium hover:bg-muted", pathname.startsWith(n.href) ? "bg-surface text-fg" : "text-fg-muted")}>
                 {n.label}
               </Link>
             ))}

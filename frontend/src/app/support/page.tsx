@@ -14,7 +14,7 @@ export default function SupportPage() {
   return (
     <div className="container-page max-w-3xl pt-12 sm:pt-16">
       <span className="grid size-12 place-items-center rounded-2xl bg-danger-soft text-danger"><Heart className="size-6" /></span>
-      <h1 className="mt-6 text-4xl font-bold tracking-tight">Підтримати Volunteerhub</h1>
+      <h1 className="mt-6 text-4xl font-medium tracking-tight">Підтримати Volunteerhub</h1>
       <p className="mt-4 text-lg leading-relaxed text-fg-muted">
         Volunteerhub безкоштовний для донорів і волонтерів, і ми не беремо комісії зі зборів. Якщо хочете допомогти розвитку та підтримці платформи, це можна зробити добровільно.
       </p>

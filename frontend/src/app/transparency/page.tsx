@@ -15,7 +15,7 @@ export default function TransparencyPage() {
     <div className="container-page pt-12 sm:pt-16">
       <div className="max-w-3xl">
         <p className="text-[13px] font-medium text-accent">Довіра та прозорість</p>
-        <h1 className="mt-2 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Як Volunteerhub перевіряє збори</h1>
+        <h1 className="mt-2 text-balance text-4xl font-medium tracking-tight sm:text-5xl">Як Volunteerhub перевіряє збори</h1>
         <p className="mt-4 text-lg leading-relaxed text-fg-muted">Ми показуємо лише ті позначки, за якими справді стоїть перевірка. Якщо чогось не перевіряли, ви побачите це на сторінці збору.</p>
       </div>
 
@@ -52,7 +52,7 @@ export default function TransparencyPage() {
       </section>
 
       <section className="mt-16 rounded-3xl border border-border bg-surface p-8 shadow-card">
-        <h2 className="text-2xl font-bold tracking-tight">Як скласти хороший звіт</h2>
+        <h2 className="text-2xl font-medium tracking-tight">Як скласти хороший звіт</h2>
         <ol className="mt-5 grid gap-4 text-sm leading-relaxed text-fg-muted md:grid-cols-3">
           <li><b className="text-fg">1. Покажіть закупівлю.</b> Опублікуйте оновлення типу «Закупівля» з рахунком чи накладною.</li>
           <li><b className="text-fg">2. Покажіть результат.</b> Фото передачі, лист подяки чи акт приймання. Без облич, якщо це небезпечно.</li>

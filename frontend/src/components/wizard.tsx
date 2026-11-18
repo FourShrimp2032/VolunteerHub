@@ -357,7 +357,7 @@ function Stepper({ step, onJump }: { step: number; onJump: (i: number) => void }
 function Head({ title, text }: { title: string; text: string }) {
   return (
     <div className="mb-1">
-      <h2 className="text-xl font-bold tracking-tight">{title}</h2>
+      <h2 className="text-xl font-medium tracking-tight">{title}</h2>
       <p className="mt-1 text-sm text-fg-muted">{text}</p>
     </div>
   );
