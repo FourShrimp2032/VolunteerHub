@@ -3,9 +3,16 @@ import { cn } from "@/lib/cn";
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={cn("size-7", className)} aria-hidden>
-      <rect width="32" height="32" rx="9" fill="oklch(0.2 0.02 265)" />
-      <path d="M9 10.5 16 22l7-11.5" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="16" cy="9.5" r="2.4" fill="oklch(0.62 0.2 263)" />
+      <defs>
+        <linearGradient id="vh-mark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="oklch(0.58 0.2 262)" />
+          <stop offset="1" stopColor="oklch(0.47 0.2 264)" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="8" fill="url(#vh-mark)" />
+      <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" fill="none" stroke="white" strokeOpacity="0.18" />
+      <path d="M9.5 11 16 21.5 22.5 11" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="16" cy="9.6" r="2.2" fill="white" />
     </svg>
   );
 }
@@ -13,8 +20,8 @@ export function LogoMark({ className }: { className?: string }) {
 export function Logo({ className }: { className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <LogoMark />
-      <span className="font-display text-[17px] font-bold tracking-tight">Volunteerhub</span>
+      <LogoMark className="size-[26px]" />
+      <span className="font-display text-[16px] font-bold tracking-[-0.035em]">Volunteerhub</span>
     </span>
   );
 }

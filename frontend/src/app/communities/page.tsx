@@ -68,7 +68,7 @@ export default function CommunitiesPage() {
         )}
       </section>
 
-      <div className="mt-14 grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
         <section>
           <h2 className="mb-5 text-xl font-bold">Спільноти</h2>
           {!d ? (

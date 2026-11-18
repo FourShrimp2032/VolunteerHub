@@ -35,7 +35,7 @@ export function DashboardShell({ title, description, actions, children, admin }:
             <Link
               key={t.href}
               href={t.href}
-              className={cn("-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-3 text-sm transition", active ? "border-fg font-medium text-fg" : "border-transparent text-fg-muted hover:text-fg")}
+              className={cn("-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-3 text-sm transition", active ? "border-accent font-medium text-fg" : "border-transparent text-fg-muted hover:text-fg")}
             >
               <t.icon className="size-4" /> {t.label}
             </Link>
@@ -44,7 +44,7 @@ export function DashboardShell({ title, description, actions, children, admin }:
       </div>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+          <h1 className="text-[26px] font-extrabold tracking-[-0.035em] sm:text-[32px]">{title}</h1>
           {description && <p className="mt-1.5 text-fg-muted">{description}</p>}
         </div>
         {actions}

@@ -168,7 +168,7 @@ npx wrangler dev --config ../infra/cloudflare/wrangler.toml   # → http://local
 
 Production is **one Cloudflare Worker** (`infra/cloudflare/wrangler.toml`) that serves the API under `/api` and the statically exported Next.js app. Data lives in the D1 database `volunteerhub-db`.
 
-**Automatic (GitHub Actions):** every push to `main` (and `claude/**` branches) runs `.github/workflows/deploy.yml`: typecheck → tests → build → migrate → deploy. Add these repository secrets under *Settings → Secrets and variables → Actions*:
+**Automatic (GitHub Actions):** every push to `main` runs `.github/workflows/deploy.yml`: typecheck → tests → build → migrate → deploy → live smoke test. Pushes to other branches and pull requests only run typecheck, tests and build; *Actions → CI & Deploy → Run workflow* can deploy a branch by hand. Only one deploy runs at a time. Add these repository secrets under *Settings → Secrets and variables → Actions*:
 
 - `CLOUDFLARE_API_TOKEN`: create it in Cloudflare → *My Profile → API Tokens* from the **Edit Cloudflare Workers** template, and add **Account → D1 → Edit**
 - `CLOUDFLARE_ACCOUNT_ID`
@@ -190,7 +190,7 @@ bash infra/scripts/deploy.sh
 
 - **URL:** https://volunteerhub.ivan-antonenko.workers.dev
 - **Health check:** `/api/health` (shows that the database is connected)
-- The live deployment is checked on every push by the `smoke-test` job in GitHub Actions (`infra/e2e/smoke.cjs`): it registers, creates a campaign through the wizard, approves it as admin, follows it as another user, logs out, then deletes its test data.
+- The live deployment is checked after every deploy by the `smoke-test` job in GitHub Actions (`infra/e2e/smoke.cjs`): it registers, creates a campaign through the wizard, approves it as admin, follows it as another user, logs out, then deletes its test data.
 - Register a new account to try the organizer and supporter flows. Campaigns you create appear publicly after an admin approves them in `/admin`.
 
 ## What is not connected yet (by design)
