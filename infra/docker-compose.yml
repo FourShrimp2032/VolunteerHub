@@ -1,0 +1,21 @@
+# Local development: `docker compose -f infra/docker-compose.yml up --build`
+#   UI  → http://localhost:3000
+#   API → http://localhost:8787/api/health
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: infra/docker/Dockerfile.backend
+    ports: ["8787:8787"]
+    volumes:
+      - d1-data:/app/backend/.wrangler   # persistent local database (SQLite / D1)
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/docker/Dockerfile.frontend
+    ports: ["3000:3000"]
+    environment:
+      API_URL: http://backend:8787
+    depends_on: [backend]
+volumes:
+  d1-data:

@@ -1,0 +1,16 @@
+# Local development config for the API only (`npm run dev` → http://localhost:8787).
+# The production config (API + frontend assets) is in ../infra/cloudflare/wrangler.toml.
+name = "volunteerhub-api-dev"
+main = "src/index.ts"
+compatibility_date = "2025-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "development"
+ALLOWED_ORIGINS = "http://localhost:3000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "volunteerhub-db"
+database_id = "local-dev"
+migrations_dir = "migrations"
