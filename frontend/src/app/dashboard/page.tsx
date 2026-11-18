@@ -60,7 +60,7 @@ function Body({ userName }: { userName: string }) {
       </div>
 
       <section>
-        <h2 className="mb-4 text-lg font-bold">Особистий вплив</h2>
+        <h2 className="mb-4 text-lg font-medium">Особистий вплив</h2>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           <StatTile icon={<UserPlus />} value={d.impact.followed} label="Стежу за зборами" />
           <StatTile icon={<Share2 />} value={d.impact.shared} label="Поширено зборів" />
@@ -76,7 +76,7 @@ function Body({ userName }: { userName: string }) {
 
       <section>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Мої збори</h2>
+          <h2 className="text-lg font-medium">Мої збори</h2>
           <Segmented
             value={tab}
             onChange={setTab}
@@ -142,13 +142,13 @@ function Body({ userName }: { userName: string }) {
       </div>
 
       <section>
-        <h2 className="mb-5 flex items-center gap-2 text-lg font-bold"><Trophy className="size-5 text-gold" /> Колекція досягнень</h2>
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-medium"><Trophy className="size-5 text-gold" /> Колекція досягнень</h2>
         <AchievementGrid items={d.achievements} />
       </section>
 
       <section>
         <div className="mb-5 flex items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-lg font-bold"><Users className="size-5 text-accent" /> Спільноти та челенджі</h2>
+          <h2 className="flex items-center gap-2 text-lg font-medium"><Users className="size-5 text-accent" /> Спільноти та челенджі</h2>
           <ButtonLink href="/communities" variant="secondary" size="sm">Усі спільноти</ButtonLink>
         </div>
         {d.communities.length === 0 && d.challenges.length === 0 ? (

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/cn";
 import { Check, Minus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Badge, ButtonLink, Card } from "@/components/ui/primitives";
@@ -38,7 +39,7 @@ export default function PricingPage() {
     <div className="container-page pt-12 sm:pt-16">
       <div className="mx-auto max-w-2xl text-center">
         <Badge tone="accent">Ми не беремо відсоток із донатів</Badge>
-        <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Безкоштовно для волонтерів. Pro для організацій.</h1>
+        <h1 className="mt-5 text-balance text-[32px] font-medium leading-[1.1] tracking-tight sm:text-[46px]">Безкоштовно для волонтерів. Pro для організацій.</h1>
         <p className="mt-4 text-lg text-fg-muted">Volunteerhub заробляє на програмних інструментах для організацій, а не на ваших донатах.</p>
       </div>
 
@@ -46,10 +47,10 @@ export default function PricingPage() {
         {PLANS.map((p) => (
           <Card key={p.key} className={p.highlight ? "relative border-fg p-7 shadow-lift ring-1 ring-fg" : "p-7"}>
             {p.highlight && <Badge tone="dark" className="absolute -top-3 left-7">Скоро</Badge>}
-            <p className="font-display text-lg font-bold">{p.name}</p>
+            <p className="font-heading text-lg font-bold">{p.name}</p>
             <p className="mt-1 text-sm text-fg-muted">{p.who}</p>
             <p className="mt-6 flex items-baseline gap-2">
-              <span className="font-display text-4xl font-extrabold tracking-tight">{p.price}</span>
+              <span className={cn("font-display font-semibold tracking-tight", p.price.length > 8 ? "text-[26px]" : "text-4xl")}>{p.price}</span>
               {p.period && <span className="text-sm text-fg-muted">{p.period}</span>}
             </p>
             {p.key === "pro" && <p className="mt-1 text-xs text-fg-subtle">Експериментальна ціна. Оплата ще не підключена.</p>}

@@ -72,7 +72,7 @@ export default function CommunityPage() {
                 <Badge tone="outline">{K.label}</Badge>
                 {d.community.isDemo && <Badge tone="dark">Демо</Badge>}
               </div>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{d.community.name}</h1>
+              <h1 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">{d.community.name}</h1>
               <p className="text-sm text-fg-muted">{d.community.members} {plural(d.community.members, "учасник", "учасники", "учасників")}</p>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function CommunityPage() {
       <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="grid content-start gap-10">
           <section>
-            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold"><Trophy className="size-5 text-gold" /> Челенджі спільноти</h2>
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-medium"><Trophy className="size-5 text-gold" /> Челенджі спільноти</h2>
             {d.challenges.length === 0 ? (
               <EmptyState title="Челенджів поки немає" description={d.canManage ? "Створіть перший, наприклад «Поширимо 20 перевірених зборів за тиждень»." : "Власник спільноти може створити челендж."} />
             ) : (
@@ -103,7 +103,7 @@ export default function CommunityPage() {
             )}
           </section>
           <section>
-            <h2 className="mb-4 text-xl font-bold">Збори учасників</h2>
+            <h2 className="mb-4 text-xl font-medium">Збори учасників</h2>
             <CampaignGrid items={d.campaigns} empty={<EmptyState title="Учасники ще не створювали зборів" />} />
           </section>
         </div>

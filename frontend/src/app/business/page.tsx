@@ -19,7 +19,7 @@ export default function BusinessPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_80%_0%,oklch(0.55_0.215_263/0.45),transparent)]" />
         <div className="container-page relative py-20 sm:py-28">
           <Badge tone="outline" className="border-white/20 bg-white/10 text-white">Corporate Volunteerhub · ранній доступ</Badge>
-          <h1 className="mt-6 max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-6xl">Волонтерство вашої команди, яке видно.</h1>
+          <h1 className="mt-6 max-w-3xl text-balance text-4xl font-medium tracking-tight sm:text-6xl">Волонтерство вашої команди, яке видно.</h1>
           <p className="mt-5 max-w-2xl text-lg text-white/70">
             Організуйте ініціативи працівників, челенджі та командну підтримку зборів в одному просторі. Компанії платять за програмне забезпечення, а не за контроль над донатами.
           </p>
@@ -44,7 +44,7 @@ export default function BusinessPage() {
 
       <section className="container-page mt-20 grid gap-8 lg:grid-cols-2 lg:items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Чесні правила для бізнесу</h2>
+          <h2 className="text-3xl font-medium tracking-tight">Чесні правила для бізнесу</h2>
           <p className="mt-3 text-fg-muted">Компанії не можуть купити місце в рекомендаціях чи позначку перевірки. Корпоративні челенджі спрямовують увагу працівників, а органічне ранжування для всіх однакове.</p>
           <ul className="mt-6 grid gap-3 text-sm">
             {["Кошти завжди йдуть напряму на банки організаторів", "Жодного прихованого просування", "Метрики участі без доступу до персональних фінансових даних", "Можна почати з безкоштовної спільноти вже сьогодні"].map((t) => (
