@@ -56,12 +56,12 @@ function Hero({ data }: { data: Home | null }) {
   const [q, setQ] = React.useState("");
   const sample = data?.almost[0] ?? data?.featured[0] ?? null;
   return (
-    <section className="relative overflow-hidden border-b border-border">
+    <section className="matrix-hero relative isolate overflow-hidden border-b">
       <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(60%_70%_at_50%_0%,black,transparent)]" aria-hidden />
-      <div className="pointer-events-none absolute left-1/2 top-[-220px] h-[440px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,oklch(0.53_0.2_262/0.14),transparent)]" aria-hidden />
+      <div className="pointer-events-none absolute left-1/2 top-[-220px] h-[440px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(180_255_0_/_0.17),transparent)]" aria-hidden />
       <div className="container-page relative grid items-center gap-14 pb-16 pt-12 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:pb-24 lg:pt-24">
         <div className="min-w-0 animate-fade-up">
-          <Link href="/transparency" className="group inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-[13px] text-fg-muted shadow-card transition hover:border-border-strong hover:text-fg">
+          <Link href="/transparency" className="group inline-flex max-w-full items-center gap-2 matrix-kicker rounded-full border py-1 pl-1 pr-3 text-[13px] text-fg-muted shadow-card transition hover:border-accent hover:text-fg">
             <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-[12px] font-semibold text-accent">0% комісії</span>
             <span className="truncate">Донати йдуть напряму на банки організаторів</span>
             <ArrowRight className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
