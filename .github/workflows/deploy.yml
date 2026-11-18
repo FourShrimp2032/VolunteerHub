@@ -1,0 +1,56 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Backend — install, typecheck, unit tests
+        working-directory: backend
+        run: npm ci && npm run typecheck && npm test
+      - name: Frontend — install, typecheck, static build
+        working-directory: frontend
+        run: npm ci && npm run typecheck && npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-out
+          path: frontend/out
+          retention-days: 3
+
+  deploy:
+    # Deploys the single production Worker. Runs on pushes (not on PRs from forks).
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VISITOR_SALT: ${{ secrets.VISITOR_SALT }}
+      ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-out
+          path: frontend/out
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Deploy to Cloudflare
+        run: bash infra/scripts/deploy.sh

@@ -1,0 +1,42 @@
+# Production deployment: ONE Cloudflare Worker serves
+#   - the Volunteerhub API   (backend/src/index.ts, routes under /api)
+#   - the static frontend    (frontend/out, built with `next build`)
+# Deploy:  npx wrangler deploy --config infra/cloudflare/wrangler.toml   (see infra/scripts/deploy.sh)
+name = "volunteerhub"
+main = "../../backend/src/index.ts"
+compatibility_date = "2025-10-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "../../frontend/out"
+binding = "ASSETS"
+# The Worker runs first so it can route /api and rewrite dynamic pages (/campaigns/<slug> → /campaigns/_).
+run_worker_first = true
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"
+
+[vars]
+ENVIRONMENT = "production"
+# Optional: a SEPARATE Monobank jar for supporting the platform itself (never mixed with fundraisers).
+# PLATFORM_SUPPORT_JAR_URL = "https://send.monobank.ua/jar/XXXXXXXXXX"
+
+# Secrets (set with `wrangler secret put <NAME>`):
+#   VISITOR_SALT  – random string used to anonymise visitor IPs for unique-view counting
+#   ADMIN_EMAILS  – comma-separated e-mails that get the admin role when they register
+
+[[d1_databases]]
+binding = "DB"
+database_name = "volunteerhub-db"
+database_id = "62414b69-4037-434b-b0bc-24710b58a3b5"
+migrations_dir = "../../backend/migrations"
+
+# Optional S3-compatible storage for uploads. Enable R2 in the Cloudflare dashboard,
+# create the bucket and uncomment — the backend switches to it automatically.
+# [[r2_buckets]]
+# binding = "UPLOADS"
+# bucket_name = "volunteerhub-uploads"
+
+[observability]
+enabled = true
