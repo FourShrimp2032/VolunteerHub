@@ -340,14 +340,14 @@ function Stepper({ step, onJump }: { step: number; onJump: (i: number) => void }
             <span
               className={cn(
                 "grid size-8 shrink-0 place-items-center rounded-full text-[13px] font-semibold transition",
-                i < step ? "bg-fg text-white" : i === step ? "bg-accent text-white shadow-ring" : "bg-muted text-fg-subtle",
+                i < step ? "bg-accent-soft text-accent ring-1 ring-accent-border" : i === step ? "bg-accent text-white shadow-ring" : "border border-border bg-surface text-fg-subtle",
               )}
             >
               {i < step ? <Check className="size-4" /> : i + 1}
             </span>
             <span className={cn("hidden truncate text-[13px] md:block", i === step ? "font-medium text-fg" : "text-fg-muted")}>{s}</span>
           </button>
-          {i < STEPS.length - 1 && <span className={cn("h-px flex-1", i < step ? "bg-fg" : "bg-border")} />}
+          {i < STEPS.length - 1 && <span className={cn("h-px flex-1", i < step ? "bg-accent" : "bg-border")} />}
         </li>
       ))}
     </ol>
@@ -357,7 +357,7 @@ function Stepper({ step, onJump }: { step: number; onJump: (i: number) => void }
 function Head({ title, text }: { title: string; text: string }) {
   return (
     <div className="mb-1">
-      <h2 className="text-xl font-medium tracking-tight">{title}</h2>
+      <h2 className="text-xl font-bold tracking-tight">{title}</h2>
       <p className="mt-1 text-sm text-fg-muted">{text}</p>
     </div>
   );

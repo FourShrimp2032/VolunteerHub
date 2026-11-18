@@ -90,7 +90,7 @@ function Explore() {
   return (
     <div className="container-page pt-8 sm:pt-12">
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Знайдіть збір, якому потрібна ваша допомога</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Знайдіть збір, якому потрібна ваша допомога</h1>
         <p className="mt-3 text-fg-muted">«Рекомендовані» враховують новизну, малу кількість переглядів, перевірки, терміновість і близькість до цілі. Не лише популярність.</p>
       </div>
 
@@ -186,8 +186,8 @@ function Chip({ active, children, onClick }: { active: boolean; children: React.
     <button
       onClick={onClick}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition",
-        active ? "border-ink bg-ink text-white" : "border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg",
+        "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition",
+        active ? "border-accent-border bg-accent-soft text-accent" : "border-border bg-surface text-fg-muted shadow-card hover:border-border-strong hover:text-fg",
       )}
     >
       {children}

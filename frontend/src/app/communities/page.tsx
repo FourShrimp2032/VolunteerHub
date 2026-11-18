@@ -47,7 +47,7 @@ export default function CommunitiesPage() {
     <div className="container-page pt-8 sm:pt-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Спільноти та челенджі</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Спільноти та челенджі</h1>
           <p className="mt-3 text-fg-muted">Університети, студентські організації, компанії та волонтерські команди разом допомагають новим зборам знайти підтримку. Рейтинги рахують участь, а не гроші.</p>
         </div>
         <Button onClick={() => (user ? setOpen(true) : router.push("/login?next=/communities"))}><Plus /> Створити спільноту</Button>
@@ -70,7 +70,7 @@ export default function CommunitiesPage() {
 
       <div className="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
         <section>
-          <h2 className="mb-5 text-xl font-medium">Спільноти</h2>
+          <h2 className="mb-5 text-xl font-bold">Спільноти</h2>
           {!d ? (
             <Skeleton className="h-60 rounded-2xl" />
           ) : d.items.length === 0 ? (

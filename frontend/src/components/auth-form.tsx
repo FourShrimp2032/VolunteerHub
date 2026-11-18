@@ -68,7 +68,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     <div className="container-page grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-10 lg:grid-cols-2">
       <div className="mx-auto w-full max-w-sm animate-fade-up">
         <LogoMark className="size-10" />
-        <h1 className="mt-6 text-[28px] font-medium tracking-tight">{mode === "login" ? "З поверненням" : "Створіть акаунт"}</h1>
+        <h1 className="mt-6 text-[30px] font-extrabold tracking-[-0.035em]">{mode === "login" ? "З поверненням" : "Створіть акаунт"}</h1>
         <p className="mt-2 text-fg-muted">
           {mode === "login" ? "Увійдіть, щоб стежити за зборами та керувати своїми." : "Один акаунт, щоб підтримувати збори й створювати власні."}
         </p>
@@ -111,21 +111,22 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           )}
         </p>
       </div>
-      <div className="relative hidden h-full min-h-[560px] overflow-hidden rounded-3xl border border-border bg-ink p-10 text-white lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_100%_0%,oklch(0.49_0.2_260/0.55),transparent)]" />
+      <div className="relative hidden h-full min-h-[560px] overflow-hidden rounded-3xl border border-border bg-surface p-10 shadow-card lg:block">
+        <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(70%_60%_at_100%_0%,black,transparent)]" aria-hidden />
+        <div className="pointer-events-none absolute right-[-160px] top-[-160px] size-[420px] rounded-full bg-[radial-gradient(closest-side,oklch(0.53_0.2_262/0.16),transparent)]" aria-hidden />
         <div className="relative flex h-full flex-col justify-between gap-10">
-          <p className="max-w-sm pt-2 font-display text-[30px] font-medium leading-[1.15] tracking-tight">Допомога, яку <span className="text-sun">видно</span> від першої гривні до звіту.</p>
-          <div className="grid gap-4">
+          <p className="max-w-sm pt-2 font-display text-[32px] font-extrabold leading-[1.1] tracking-[-0.04em]">Допомога, яку <span className="text-gradient">видно</span> від першої гривні до звіту.</p>
+          <div className="grid gap-3">
             {[
               { icon: HandHeart, t: "Донати напряму", d: "Ми не торкаємося грошей. Кнопка веде на офіційну банку Monobank." },
               { icon: BadgeCheck, t: "Чесні перевірки", d: "Позначки довіри лише після реальної модерації. Їх не можна купити." },
               { icon: Sparkles, t: "Impact XP", d: "Рівні й досягнення за участь, а не за суму донату." },
             ].map((x) => (
-              <div key={x.t} className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur">
-                <x.icon className="size-5 shrink-0 text-sun" />
+              <div key={x.t} className="flex gap-4 rounded-xl border border-border bg-surface/90 p-5 shadow-card backdrop-blur">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-accent-border/60 bg-accent-soft text-accent"><x.icon className="size-[18px]" aria-hidden /></span>
                 <div>
-                  <p className="font-semibold">{x.t}</p>
-                  <p className="mt-1 text-sm text-white/65">{x.d}</p>
+                  <p className="font-heading font-bold tracking-tight">{x.t}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{x.d}</p>
                 </div>
               </div>
             ))}
