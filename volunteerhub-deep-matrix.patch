@@ -1,0 +1,245 @@
+--- a/frontend/src/app/globals.css
++++ b/frontend/src/app/globals.css
+@@ -1,67 +1,60 @@
+ @import "tailwindcss";
+ 
+ /*
+- * Volunteerhub design tokens — premium minimal light theme.
+- * Cool neutrals (slate-tinted, hue 255), a single "Volunteer blue" accent,
+- * and a restrained amber kept only for Impact XP and achievements.
+- * Type: Manrope for headings, Inter for UI and body.
++ * VOLUNTEERHUB / DEEP MATRIX
++ * Dark-first, high-contrast interface with acid-lime action colour.
+  */
+ @theme {
+   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+   --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+   --font-heading: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+ 
+-  /* Cool neutrals. */
+-  --color-bg: oklch(0.988 0.002 255);
+-  --color-surface: oklch(1 0 0);
+-  --color-subtle: oklch(0.975 0.003 255);
+-  --color-muted: oklch(0.955 0.004 255);
+-  --color-border: oklch(0.922 0.005 255);
+-  --color-border-strong: oklch(0.86 0.008 255);
+-  --color-fg: oklch(0.2 0.015 260);
+-  --color-fg-muted: oklch(0.46 0.016 260);
+-  --color-fg-subtle: oklch(0.56 0.014 260);
+-  --color-ink: oklch(0.19 0.015 260);
++  --color-bg: #0B1A12;
++  --color-surface: #102219;
++  --color-subtle: #13291d;
++  --color-muted: #1a3325;
++  --color-border: #294333;
++  --color-border-strong: #3b5b43;
++  --color-fg: #eff8e9;
++  --color-fg-muted: #a2b6a3;
++  --color-fg-subtle: #718a76;
++  --color-ink: #0B1A12;
+ 
+-  /* The one accent. */
+-  --color-accent: oklch(0.53 0.2 262);
+-  --color-accent-hover: oklch(0.47 0.2 262);
+-  --color-accent-soft: oklch(0.965 0.02 262);
+-  --color-accent-border: oklch(0.88 0.06 262);
+-  --color-accent-fg: oklch(0.995 0 0);
++  --color-accent: #B4FF00;
++  --color-accent-hover: #c8ff43;
++  --color-accent-soft: #263b13;
++  --color-accent-border: #587b1d;
++  --color-accent-fg: #0B1A12;
+ 
+-  /* Legacy "sun" tokens now resolve to the accent family so nothing warm leaks in. */
+-  --color-sun: oklch(0.53 0.2 262);
+-  --color-sun-soft: oklch(0.965 0.02 262);
+-  --color-sun-fg: oklch(0.45 0.18 262);
++  --color-sun: #B4FF00;
++  --color-sun-soft: #263b13;
++  --color-sun-fg: #B4FF00;
++  --color-gold: #B4FF00;
++  --color-gold-soft: #263b13;
++  --color-gold-fg: #d5ff7a;
+ 
+-  /* Amber, reserved for Impact XP and achievements. */
+-  --color-gold: oklch(0.76 0.14 75);
+-  --color-gold-soft: oklch(0.97 0.03 85);
+-  --color-gold-fg: oklch(0.5 0.11 65);
++  --color-success: #B4FF00;
++  --color-success-soft: #263b13;
++  --color-warning: #ffb547;
++  --color-warning-soft: #3b2a17;
++  --color-danger: #ff5264;
++  --color-danger-soft: #3b1c24;
+ 
+-  --color-success: oklch(0.55 0.13 158);
+-  --color-success-soft: oklch(0.965 0.03 158);
+-  --color-warning: oklch(0.7 0.15 65);
+-  --color-warning-soft: oklch(0.972 0.035 80);
+-  --color-danger: oklch(0.57 0.2 25);
+-  --color-danger-soft: oklch(0.968 0.022 25);
++  --radius-lg: 0.65rem;
++  --radius-xl: 0.85rem;
++  --radius-2xl: 1.1rem;
++  --radius-3xl: 1.5rem;
+ 
+-  --radius-lg: 0.5rem;
+-  --radius-xl: 0.625rem;
+-  --radius-2xl: 0.875rem;
+-  --radius-3xl: 1.25rem;
++  --shadow-card: 0 1px 0 rgb(255 255 255 / 3%), 0 12px 34px -18px rgb(0 0 0 / 75%);
++  --shadow-lift: 0 0 0 1px rgb(180 255 0 / 9%), 0 18px 44px -20px rgb(0 0 0 / 90%);
++  --shadow-pop: 0 0 0 1px rgb(180 255 0 / 14%), 0 24px 64px -22px rgb(0 0 0 / 95%);
++  --shadow-ring: 0 0 0 3px rgb(180 255 0 / 22%);
+ 
+-  --shadow-card: 0 1px 2px oklch(0.2 0.02 260 / 0.04);
+-  --shadow-lift: 0 1px 2px oklch(0.2 0.02 260 / 0.04), 0 8px 24px -8px oklch(0.2 0.02 260 / 0.12);
+-  --shadow-pop: 0 0 0 1px oklch(0.2 0.02 260 / 0.06), 0 12px 32px -8px oklch(0.2 0.02 260 / 0.18);
+-  --shadow-ring: 0 0 0 3px oklch(0.53 0.2 262 / 0.16);
+-
+-  --animate-fade-up: fade-up 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
++  --animate-fade-up: fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+   --animate-shimmer: shimmer 1.6s linear infinite;
+   @keyframes fade-up {
+-    from { opacity: 0; transform: translateY(6px); }
+-    to { opacity: 1; transform: none; }
++    from { opacity: 0; transform: translateY(18px); filter: blur(5px); }
++    to { opacity: 1; transform: none; filter: blur(0); }
+   }
+   @keyframes shimmer {
+     from { background-position: -400px 0; }
+@@ -70,13 +63,56 @@
+ }
+ 
+ @layer base {
+-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+-  body { background: var(--color-bg); color: var(--color-fg); font-family: var(--font-sans); font-feature-settings: "cv11", "ss01", "ss03"; }
+-  h1, h2 { font-family: var(--font-display); letter-spacing: -0.03em; font-weight: 700; }
+-  h3, h4 { font-family: var(--font-heading); letter-spacing: -0.015em; font-weight: 700; }
+-  ::selection { background: oklch(0.53 0.2 262 / 0.18); }
+-  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 6px; }
++  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
++  body {
++    background: var(--color-bg);
++    color: var(--color-fg);
++    font-family: var(--font-sans);
++    font-feature-settings: "cv11", "ss01", "ss03";
++    background-image: radial-gradient(ellipse at 50% -28rem, rgb(91 145 39 / 17%), transparent 58%);
++  }
++  h1, h2 { font-family: var(--font-display); letter-spacing: -0.045em; font-weight: 800; }
++  h3, h4 { font-family: var(--font-heading); letter-spacing: -0.02em; font-weight: 700; }
++  ::selection { background: rgb(180 255 0 / 30%); color: #f5ffe9; }
++  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 6px; }
+   button:not(:disabled), [role="button"]:not([aria-disabled="true"]), select, summary { cursor: pointer; }
++  a { text-underline-offset: 4px; }
++}
++
++/* Dark surfaces for legacy utility classes, plus a consistent matrix treatment. */
++@layer utilities {
++  .bg-grid {
++    background-image: linear-gradient(to right, rgb(180 255 0 / 6%) 1px, transparent 1px),
++      linear-gradient(to bottom, rgb(180 255 0 / 6%) 1px, transparent 1px);
++    background-size: 44px 44px;
++  }
++  .bg-dots { background-image: radial-gradient(rgb(180 255 0 / 28%) 1px, transparent 1px); background-size: 15px 15px; }
++  .text-gradient {
++    background: linear-gradient(105deg, #d8ff7a 0%, #B4FF00 45%, #74bd22 100%);
++    -webkit-background-clip: text; background-clip: text; color: transparent;
++  }
++  .matrix-hero {
++    background: linear-gradient(135deg, rgb(14 34 23 / 98%), rgb(7 17 12 / 96%));
++    border-color: rgb(180 255 0 / 18%);
++  }
++  .matrix-kicker {
++    color: #B4FF00;
++    border: 1px solid rgb(180 255 0 / 28%);
++    background: rgb(180 255 0 / 7%);
++    box-shadow: 0 0 24px rgb(180 255 0 / 7%);
++  }
++}
++
++/* The page itself enters with a restrained directional wipe on route changes. */
++main > * {
++  animation: route-enter 520ms cubic-bezier(.2,.75,.25,1) both;
++}
++@keyframes route-enter {
++  from { opacity: .72; transform: translateY(10px); clip-path: inset(1.5% 0 0); }
++  to { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0); }
++}
++@media (prefers-reduced-motion: reduce) {
++  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+ }
+ 
+ @utility container-page {
+@@ -89,18 +125,13 @@
+ 
+ @utility text-balance { text-wrap: balance; }
+ 
+-/* Faint engineering grid used behind heroes. */
+ @utility bg-grid {
+-  background-image:
+-    linear-gradient(to right, oklch(0.2 0.02 260 / 0.05) 1px, transparent 1px),
+-    linear-gradient(to bottom, oklch(0.2 0.02 260 / 0.05) 1px, transparent 1px);
+-  background-size: 48px 48px;
++  background-image: linear-gradient(to right, rgb(180 255 0 / 6%) 1px, transparent 1px), linear-gradient(to bottom, rgb(180 255 0 / 6%) 1px, transparent 1px);
++  background-size: 44px 44px;
+ }
+-
+-/* Small dot pattern for generated covers and panels. */
+ @utility bg-dots {
+-  background-image: radial-gradient(currentColor 1px, transparent 1px);
+-  background-size: 14px 14px;
++  background-image: radial-gradient(rgb(180 255 0 / 28%) 1px, transparent 1px);
++  background-size: 15px 15px;
+ }
+ 
+ @utility skeleton {
+@@ -118,7 +149,7 @@
+ 
+ /* Accent text gradient for one or two words in a headline. */
+ @utility text-gradient {
+-  background: linear-gradient(180deg, oklch(0.58 0.2 262), oklch(0.45 0.2 266));
++  background: linear-gradient(105deg, #d8ff7a 0%, #B4FF00 45%, #74bd22 100%);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+--- a/frontend/src/app/layout.tsx
++++ b/frontend/src/app/layout.tsx
+@@ -16,7 +16,7 @@
+   icons: { icon: "/icon.svg" },
+ };
+ 
+-export const viewport: Viewport = { themeColor: "#fbfcfd", width: "device-width", initialScale: 1 };
++export const viewport: Viewport = { themeColor: "#0B1A12", width: "device-width", initialScale: 1 };
+ 
+ export default function RootLayout({ children }: { children: React.ReactNode }) {
+   return (
+--- a/frontend/src/components/site-header.tsx
++++ b/frontend/src/components/site-header.tsx
+@@ -53,7 +53,7 @@
+             <Link
+               key={n.href}
+               href={n.href}
+-              className={cn("rounded-md px-3 py-1.5 text-[14px] font-medium transition-colors", pathname.startsWith(n.href) ? "text-fg" : "text-fg-muted hover:bg-muted hover:text-fg")}
++              className={cn("rounded-md px-3 py-1.5 text-[14px] font-medium transition-colors", pathname.startsWith(n.href) ? "bg-accent-soft/70 text-accent" : "text-fg-muted hover:bg-muted hover:text-fg")}
+             >
+               {n.label}
+             </Link>
+--- a/frontend/src/app/page.tsx
++++ b/frontend/src/app/page.tsx
+@@ -56,12 +56,12 @@
+   const [q, setQ] = React.useState("");
+   const sample = data?.almost[0] ?? data?.featured[0] ?? null;
+   return (
+-    <section className="relative overflow-hidden border-b border-border">
++    <section className="matrix-hero relative isolate overflow-hidden border-b">
+       <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(60%_70%_at_50%_0%,black,transparent)]" aria-hidden />
+-      <div className="pointer-events-none absolute left-1/2 top-[-220px] h-[440px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,oklch(0.53_0.2_262/0.14),transparent)]" aria-hidden />
++      <div className="pointer-events-none absolute left-1/2 top-[-220px] h-[440px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(180_255_0_/_0.17),transparent)]" aria-hidden />
+       <div className="container-page relative grid items-center gap-14 pb-16 pt-12 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:pb-24 lg:pt-24">
+         <div className="min-w-0 animate-fade-up">
+-          <Link href="/transparency" className="group inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-[13px] text-fg-muted shadow-card transition hover:border-border-strong hover:text-fg">
++          <Link href="/transparency" className="group inline-flex max-w-full items-center gap-2 matrix-kicker rounded-full border py-1 pl-1 pr-3 text-[13px] text-fg-muted shadow-card transition hover:border-accent hover:text-fg">
+             <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-[12px] font-semibold text-accent">0% комісії</span>
+             <span className="truncate">Донати йдуть напряму на банки організаторів</span>
+             <ArrowRight className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />

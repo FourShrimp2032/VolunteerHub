@@ -53,7 +53,7 @@ export function SiteHeader() {
             <Link
               key={n.href}
               href={n.href}
-              className={cn("rounded-md px-3 py-1.5 text-[14px] font-medium transition-colors", pathname.startsWith(n.href) ? "text-fg" : "text-fg-muted hover:bg-muted hover:text-fg")}
+              className={cn("rounded-md px-3 py-1.5 text-[14px] font-medium transition-colors", pathname.startsWith(n.href) ? "bg-accent-soft/70 text-accent" : "text-fg-muted hover:bg-muted hover:text-fg")}
             >
               {n.label}
             </Link>
