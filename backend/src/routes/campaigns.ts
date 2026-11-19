@@ -23,7 +23,7 @@ import {
 import type { AppEnv } from "../env";
 import { rateLimit, requireUser } from "../lib/auth";
 import { CATEGORY_SLUGS, DAY, PUBLIC_STATUSES } from "../lib/constants";
-import { buildSections, progressOf } from "../lib/discovery";
+import { buildSections, progressOf, totalRaised } from "../lib/discovery";
 import { awardXp, evaluateProgress } from "../lib/gamification";
 import { parseJarUrl } from "../lib/monobank";
 import { campaignCards, fileUrl, loadCampaignBySlugOrId, publicUser, toCard, verificationOf } from "../lib/serialize";
@@ -32,6 +32,8 @@ import { body } from "../lib/validate";
 import { connectCampaign, connectionStatus, disconnectCampaign, MonoError } from "../lib/monobank-live";
 import { canPollPublic, PUBLIC_VIEW_STALE_MS, pollPublicJar } from "../lib/monobank-public";
 import { monobankConnections } from "../db/schema";
+import { templateConfigSchema } from "../lib/helpers";
+import { templateOut, topHelpers } from "./helpers";
 
 const budgetSchema = z.array(z.object({ label: z.string().trim().min(1, "Вкажіть назву статті бюджету").max(120), amount: z.number().int().min(0).max(1_000_000_000) })).max(30);
 
@@ -68,6 +70,12 @@ async function visitorHash(c: Context<AppEnv>, db: DB) {
   const ua = c.req.header("user-agent") ?? "";
   return sha256Hex(`${await visitorSalt(c, db)}|${ip}|${ua}`);
 }
+
+/** Main fundraisers are published only by verified organizations (helpers open jars for them). */
+export function canCreateFundraiser(user: User) {
+  return !!user.orgVerifiedAt || user.role === "admin";
+}
+const ORG_ONLY = "Основні збори створюють лише перевірені організації. Подайте заявку організації в кабінеті або відкрийте допоміжну банку для одного з перевірених зборів.";
 
 function canView(c: Campaign, user: User | null) {
   if ((PUBLIC_STATUSES as readonly string[]).includes(c.status)) return true;
@@ -320,6 +328,8 @@ export const campaignRoutes = new Hono<AppEnv>()
         })),
         timeline: timelineOf(camp, updates),
         verification: verificationOf(camp, org ?? null, hasFinal),
+        template: templateOut(camp, org ?? null),
+        helpers: await topHelpers(db, camp.id),
       },
       organizer: org ? { ...publicUser(org), campaignsCount: orgCampaigns[0].n } : null,
       viewer,
@@ -437,6 +447,7 @@ export const campaignRoutes = new Hono<AppEnv>()
   .post("/", async (c) => {
     const user = requireUser(c);
     const db = getDb(c.env.DB);
+    if (!canCreateFundraiser(user)) return c.json({ error: ORG_ONLY }, 403);
     const input = await body(c, draftSchema);
     if (!(await rateLimit(db, `create:${user.id}`, 20, DAY))) return c.json({ error: "Забагато нових зборів за добу." }, 429);
     const id = newId("c_");
@@ -466,6 +477,8 @@ export const campaignRoutes = new Hono<AppEnv>()
       campaign: {
         ...campaign,
         coverUrl: fileUrl(campaign.coverFileId),
+        templateUrl: fileUrl(campaign.templateFileId),
+        templateConfig: campaign.templateConfig ? JSON.parse(campaign.templateConfig) : null,
         budget: budget.map((b) => ({ label: b.label, amount: b.amount })),
         attachments: attachments.map((a) => ({ ...a, url: fileUrl(a.fileId) })),
       },
@@ -489,8 +502,10 @@ export const campaignRoutes = new Hono<AppEnv>()
     return c.json({ ok: true });
   })
   .post("/:id/submit", async (c) => {
-    const { db, campaign } = await ownCampaign(c, c.req.param("id"));
+    const { db, user, campaign } = await ownCampaign(c, c.req.param("id"));
     if (!["draft", "rejected"].includes(campaign.status)) return c.json({ error: "Збір вже надіслано на перевірку." }, 400);
+    const [owner] = campaign.organizerId === user.id ? [user] : await db.select().from(users).where(eq(users.id, campaign.organizerId)).limit(1);
+    if (!owner || !canCreateFundraiser(owner)) return c.json({ error: ORG_ONLY }, 403);
     const missing: string[] = [];
     if (campaign.title.length < 5) missing.push("назва");
     if (campaign.description.length < 80) missing.push("опис (мінімум 80 символів)");
@@ -506,12 +521,43 @@ export const campaignRoutes = new Hono<AppEnv>()
     const input = await body(c, z.object({ raisedAmount: z.number().int().min(0).max(1_000_000_000) }));
     // Manual fallback for campaigns not connected to Monobank (a connected jar's events keep raising it).
     const patch: Partial<Campaign> = { raisedAmount: input.raisedAmount, raisedUpdatedAt: Date.now(), raisedSource: "organizer", updatedAt: Date.now() };
-    if (campaign.goalAmount > 0 && input.raisedAmount >= campaign.goalAmount && campaign.status === "active") {
+    if (campaign.goalAmount > 0 && totalRaised({ ...campaign, raisedAmount: input.raisedAmount }) >= campaign.goalAmount && campaign.status === "active") {
       patch.status = "goal_reached";
       patch.goalReachedAt = Date.now();
     }
     await db.update(campaigns).set(patch).where(eq(campaigns.id, campaign.id));
     return c.json({ ok: true, status: patch.status ?? campaign.status });
+  })
+  // ------------------------------------------- helping-jar template (stock image)
+  .put("/:id/template", async (c) => {
+    const { db, campaign } = await ownCampaign(c, c.req.param("id"));
+    if (!EDITABLE_STATUSES.has(campaign.status)) return c.json({ error: "Завершений збір не можна редагувати." }, 400);
+    const input = await body(
+      c,
+      z.object({
+        fileId: z.string().max(40).nullable(),
+        config: templateConfigSchema.nullable(),
+        captionTemplate: z.string().trim().max(2000).default(""),
+        helpersInTotal: z.boolean().optional(),
+      }),
+    );
+    if (input.fileId && !input.config) return c.json({ error: "Позначте, де розмістити фото та «Моя ціль»." }, 400);
+    if (input.fileId) {
+      await assertOwnFile(db, input.fileId, campaign.organizerId);
+      const [f] = await db.select({ mime: files.mime }).from(files).where(eq(files.id, input.fileId)).limit(1);
+      if (!f?.mime.startsWith("image/")) return c.json({ error: "Шаблон має бути зображенням (PNG або JPG)." }, 400);
+    }
+    await db
+      .update(campaigns)
+      .set({
+        templateFileId: input.fileId,
+        templateConfig: input.fileId && input.config ? JSON.stringify(input.config) : null,
+        captionTemplate: input.captionTemplate,
+        ...(input.helpersInTotal !== undefined ? { helpersInTotal: input.helpersInTotal } : {}),
+        updatedAt: Date.now(),
+      })
+      .where(eq(campaigns.id, campaign.id));
+    return c.json({ ok: true });
   })
   // ------------------------------------------------ Monobank live totals
   .get("/:id/monobank", async (c) => {

@@ -36,6 +36,9 @@ for (const o of organizers) {
     referral_code: o.id.replace("demo_u_", "demo"),
     xp: 120,
     is_demo: 1,
+    org_verified_at: now - 60 * DAY,
+    org_name: o.name,
+    org_kind: "initiative",
     created_at: now - 60 * DAY,
   });
 }

@@ -1,6 +1,6 @@
 /** Tiny typed fetch wrapper for the Volunteerhub API (same origin, cookie session). */
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public data: Record<string, unknown> | null = null) {
     super(message);
   }
 }
@@ -22,14 +22,16 @@ export async function api<T = unknown>(path: string, init: RequestInit & { json?
   }
   if (!res.ok) {
     const msg = (data && typeof data === "object" && "error" in data && typeof (data as { error: unknown }).error === "string" ? (data as { error: string }).error : null) ?? "Щось пішло не так. Спробуйте ще раз.";
-    throw new ApiError(res.status, msg);
+    throw new ApiError(res.status, msg, data && typeof data === "object" ? (data as Record<string, unknown>) : null);
   }
   return data as T;
 }
 
-export async function uploadFile(file: File, purpose: "image" | "document" | "verification") {
+/** `raw`: the file is already prepared (e.g. a PNG template that must keep its transparency). */
+export async function uploadFile(file: File | Blob, purpose: "image" | "document" | "verification", opts: { raw?: boolean; name?: string } = {}) {
   const fd = new FormData();
-  const prepared = purpose === "image" ? await downscaleImage(file) : file;
+  const asFile = file instanceof File ? file : new File([file], opts.name ?? "image.jpg", { type: file.type });
+  const prepared = purpose === "image" && !opts.raw ? await downscaleImage(asFile) : asFile;
   fd.append("file", prepared);
   fd.append("purpose", purpose);
   return api<{ id: string; url: string; name: string; mime: string; size: number }>("/files", { method: "POST", body: fd });

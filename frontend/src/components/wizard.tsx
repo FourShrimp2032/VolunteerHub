@@ -11,6 +11,8 @@ import { CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/cn";
 import { money } from "@/lib/format";
 import { useToast } from "@/lib/toast";
+import type { TemplateConfig } from "@/lib/types";
+import { TemplateEditor } from "@/components/template-editor";
 
 type Draft = {
   title: string; summary: string; description: string; category: string; city: string; coverFileId: string | null; coverUrl: string | null;
@@ -20,7 +22,7 @@ type Attachment = { id: string; title: string; url: string; mime: string; size: 
 
 const EMPTY: Draft = { title: "", summary: "", description: "", category: "", city: "", coverFileId: null, coverUrl: null, goalAmount: "", deadline: "", urgent: false, budget: [{ label: "", amount: "" }], jarUrl: "" };
 
-const STEPS = ["Про збір", "Ціль і бюджет", "Банка Monobank", "Документи", "Перегляд"];
+const STEPS = ["Про збір", "Ціль і бюджет", "Банка Monobank", "Документи", "Шаблон для помічників", "Перегляд"];
 const JAR_RE = /^(https?:\/\/)?send\.monobank\.ua\/jar\/[A-Za-z0-9]{6,16}\/?(\?.*)?$/i;
 
 export function CampaignWizard({ editId }: { editId?: string | null }) {
@@ -36,6 +38,9 @@ export function CampaignWizard({ editId }: { editId?: string | null }) {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [busy, setBusy] = React.useState(false);
   const [loaded, setLoaded] = React.useState(!editId);
+  const [tpl, setTpl] = React.useState<{ url: string | null; fileId: string | null; config: TemplateConfig | null; captionTemplate: string; helpersInTotal: boolean }>({
+    url: null, fileId: null, config: null, captionTemplate: "", helpersInTotal: true,
+  });
 
   React.useEffect(() => {
     if (!editId) return;
@@ -54,6 +59,13 @@ export function CampaignWizard({ editId }: { editId?: string | null }) {
           urgent: !!c.urgent,
           budget: c.budget.length ? c.budget.map((b) => ({ label: b.label, amount: String(b.amount) })) : [{ label: "", amount: "" }],
           jarUrl: String(c.jarUrl ?? ""),
+        });
+        setTpl({
+          url: (c.templateUrl as string) ?? null,
+          fileId: (c.templateFileId as string) ?? null,
+          config: (c.templateConfig as TemplateConfig) ?? null,
+          captionTemplate: String(c.captionTemplate ?? ""),
+          helpersInTotal: c.helpersInTotal !== false,
         });
         setSlug(String(c.slug));
         setStatus(String(c.status));
@@ -265,7 +277,23 @@ export function CampaignWizard({ editId }: { editId?: string | null }) {
 
         {step === 3 && id && <DocsStep campaignId={id} attachments={attachments} setAttachments={setAttachments} />}
 
-        {step === 4 && (
+        {step === 4 && id && (
+          <div className="grid gap-6">
+            <Head title="Шаблон для допоміжних банок" text="Будь-хто зможе відкрити допоміжну банку для вашого збору за 3 кроки й отримати готове зображення для Stories у вашому стилі. Можна налаштувати й пізніше." />
+            <TemplateEditor
+              key={tpl.fileId ?? "none"}
+              compact
+              campaignId={id}
+              title={d.title}
+              orgName={user?.orgName || user?.name || ""}
+              totalGoal={goal}
+              initial={tpl}
+              onSaved={() => api<{ campaign: Record<string, unknown> }>(`/campaigns/${id}/edit`).then(({ campaign: c }) => setTpl({ url: (c.templateUrl as string) ?? null, fileId: (c.templateFileId as string) ?? null, config: (c.templateConfig as TemplateConfig) ?? null, captionTemplate: String(c.captionTemplate ?? ""), helpersInTotal: c.helpersInTotal !== false })).catch(() => null)}
+            />
+          </div>
+        )}
+
+        {step === 5 && (
           <div className="grid gap-6">
             <Head title="Перегляд і надсилання" text="Так збір виглядатиме в каталозі. Після модерації він стане публічним." />
             <div className="grid gap-6 sm:grid-cols-[300px_1fr]">
@@ -273,10 +301,10 @@ export function CampaignWizard({ editId }: { editId?: string | null }) {
                 <CampaignCard
                   c={{
                     id: id ?? "preview", slug: slug ?? "", title: d.title, summary: d.summary || d.description.slice(0, 140), category: d.category || "humanitarian", city: d.city, coverUrl: d.coverUrl,
-                    goalAmount: goal, raisedAmount: 0, raisedUpdatedAt: null, raisedSource: "organizer_reported", progress: 0, deadline: d.deadline ? new Date(d.deadline).getTime() : null, urgent: d.urgent,
+                    goalAmount: goal, raisedAmount: 0, mainRaised: 0, helpersRaised: 0, helpersCount: 0, helpersInTotal: true, acceptsHelpers: false, raisedUpdatedAt: null, raisedSource: "organizer_reported", progress: 0, deadline: d.deadline ? new Date(d.deadline).getTime() : null, urgent: d.urgent,
                     status: "active", isDemo: false, publishedAt: Date.now(), createdAt: Date.now(), viewCount: 0, followers: 0,
                     verification: { identityReviewed: !!user?.identityVerified, purposeReviewed: false, destinationVerified: false, reportSubmitted: false },
-                    organizer: user ? { id: user.id, name: user.name, avatarUrl: user.avatarUrl, identityVerified: user.identityVerified, isDemo: false } : null,
+                    organizer: user ? { id: user.id, name: user.orgName || user.name, avatarUrl: user.avatarUrl, identityVerified: user.identityVerified, isDemo: false } : null,
                   }}
                 />
               </div>

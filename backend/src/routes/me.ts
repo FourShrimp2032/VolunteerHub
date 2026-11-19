@@ -26,6 +26,7 @@ import { ACHIEVEMENTS, XP_RULES, awardXp, challengeProgress, computeMissions, ev
 import { campaignCards, privateUser } from "../lib/serialize";
 import { newId } from "../lib/util";
 import { body } from "../lib/validate";
+import { totalRaised } from "../lib/discovery";
 
 export const meRoutes = new Hono<AppEnv>()
   .patch("/", async (c) => {
@@ -150,7 +151,7 @@ export const meRoutes = new Hono<AppEnv>()
         active: rows.filter((r) => r.status === "active").length,
         views: rows.reduce((s, r) => s + r.viewCount, 0),
         followers: cards.reduce((s, x) => s + x.followers, 0),
-        reportedRaised: rows.reduce((s, r) => s + r.raisedAmount, 0),
+        reportedRaised: rows.reduce((s, r) => s + totalRaised(r), 0),
         donateClicks: rows.reduce((s, r) => s + r.donateClicks, 0),
         shares: sharesN,
         updates: updatesN,
@@ -162,7 +163,11 @@ export const meRoutes = new Hono<AppEnv>()
   .get("/verification", async (c) => {
     const user = requireUser(c);
     const rows = await getDb(c.env.DB).select().from(verificationRequests).where(eq(verificationRequests.userId, user.id)).orderBy(desc(verificationRequests.createdAt));
-    return c.json({ verified: !!user.identityVerifiedAt, requests: rows.map((r) => ({ ...r, fileUrl: r.fileId ? `/api/files/${r.fileId}` : null })) });
+    return c.json({
+      verified: !!user.identityVerifiedAt,
+      organization: user.orgVerifiedAt ? { name: user.orgName, kind: user.orgKind, code: user.orgCode, website: user.orgWebsite, verifiedAt: user.orgVerifiedAt } : null,
+      requests: rows.map((r) => ({ ...r, details: JSON.parse(r.details || "{}"), fileUrl: r.fileId ? `/api/files/${r.fileId}` : null })),
+    });
   })
   .post("/verification", async (c) => {
     const user = requireUser(c);
@@ -176,6 +181,33 @@ export const meRoutes = new Hono<AppEnv>()
       .where(and(eq(verificationRequests.userId, user.id), eq(verificationRequests.status, "pending")));
     if (pending.n > 0) return c.json({ error: "У вас вже є запит на розгляді." }, 400);
     await db.insert(verificationRequests).values({ id: newId("v_"), userId: user.id, note: input.note, fileId: input.fileId, createdAt: Date.now() });
+    return c.json({ ok: true }, 201);
+  })
+  // Organization application: once approved, the account can publish main fundraisers.
+  .post("/organization", async (c) => {
+    const user = requireUser(c);
+    const db = getDb(c.env.DB);
+    if (user.orgVerifiedAt) return c.json({ error: "Організацію вже перевірено." }, 400);
+    const input = await body(
+      c,
+      z.object({
+        name: z.string().trim().min(2, "Вкажіть назву організації").max(120),
+        kind: z.enum(["charity_fund", "ngo", "military_unit", "initiative", "other"], { message: "Оберіть тип організації" }),
+        code: z.string().trim().max(20).regex(/^\d{0,20}$/, "Код ЄДРПОУ складається з цифр").default(""),
+        website: z.string().trim().max(200).default(""),
+        note: z.string().trim().min(20, "Опишіть діяльність організації щонайменше 20 символами").max(2000),
+        fileId: z.string().max(40, "Завантажте документ"),
+      }),
+    );
+    const [f] = await db.select({ o: files.ownerId, v: files.visibility }).from(files).where(eq(files.id, input.fileId));
+    if (!f || f.o !== user.id || f.v !== "private") return c.json({ error: "Завантажте документ для перевірки." }, 400);
+    const [pending] = await db
+      .select({ n: count() })
+      .from(verificationRequests)
+      .where(and(eq(verificationRequests.userId, user.id), eq(verificationRequests.status, "pending")));
+    if (pending.n > 0) return c.json({ error: "У вас вже є запит на розгляді." }, 400);
+    const { note, fileId, ...details } = input;
+    await db.insert(verificationRequests).values({ id: newId("v_"), userId: user.id, kind: "organization", details: JSON.stringify(details), note, fileId, createdAt: Date.now() });
     return c.json({ ok: true }, 201);
   })
   .get("/organizer-summary", async (c) => {

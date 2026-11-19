@@ -17,6 +17,7 @@
  */
 import { and, eq, inArray, isNotNull, lt, or, isNull } from "drizzle-orm";
 import type { DB } from "../db/client";
+import { totalRaised } from "./discovery";
 import { campaigns, monobankConnections, monobankEvents, type Campaign, type MonobankConnection } from "../db/schema";
 import type { Env } from "../env";
 import { newId, randomToken } from "./util";
@@ -127,7 +128,7 @@ export async function decryptToken(env: Env, enc: string) {
 async function setRaised(db: DB, camp: Campaign, amount: number) {
   const now = Date.now();
   const patch: Partial<Campaign> = { raisedAmount: amount, raisedUpdatedAt: now, raisedSource: "jar", updatedAt: now };
-  if (camp.status === "active" && camp.goalAmount > 0 && amount >= camp.goalAmount) {
+  if (camp.status === "active" && camp.goalAmount > 0 && totalRaised({ ...camp, raisedAmount: amount }) >= camp.goalAmount) {
     patch.status = "goal_reached";
     patch.goalReachedAt = now;
   }

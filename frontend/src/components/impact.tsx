@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, Check, FileCheck, Flag, Lock, Megaphone, Sparkles, Sunrise, Target, Trophy, Users, type LucideIcon } from "lucide-react";
+import { CalendarCheck, Check, FileCheck, Flag, Lock, Megaphone, PiggyBank, Sparkles, Sunrise, Target, Trophy, Users, type LucideIcon } from "lucide-react";
 import * as React from "react";
 import { Avatar } from "@/components/avatar";
 import { Badge, Button, Card, Progress } from "@/components/ui/primitives";
@@ -82,7 +82,7 @@ export function LevelCard({ level }: { level: Level }) {
 }
 
 const ICONS: Record<string, LucideIcon> = {
-  sparkles: Sparkles, sunrise: Sunrise, megaphone: Megaphone, users: Users, "calendar-check": CalendarCheck, trophy: Trophy, flag: Flag, "file-check": FileCheck,
+  sparkles: Sparkles, sunrise: Sunrise, megaphone: Megaphone, users: Users, "calendar-check": CalendarCheck, trophy: Trophy, flag: Flag, "file-check": FileCheck, "piggy-bank": PiggyBank, target: Target,
 };
 
 const TIER = {

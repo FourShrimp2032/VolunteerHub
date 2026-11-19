@@ -12,6 +12,7 @@
  */
 import { and, eq, inArray, isNotNull, isNull, lt, ne, or } from "drizzle-orm";
 import type { DB } from "../db/client";
+import { totalRaised } from "./discovery";
 import { campaigns, type Campaign } from "../db/schema";
 
 const HANDLER = "https://send.monobank.ua/api/handler";
@@ -60,7 +61,7 @@ export async function pollPublicJar(db: DB, camp: Campaign): Promise<Campaign> {
   const amount = Math.max(camp.raisedAmount, jar.balance);
   const patch: Partial<Campaign> = { raisedAmount: amount, raisedUpdatedAt: now, raisedSource: "jar_public" };
   if (amount !== camp.raisedAmount) patch.updatedAt = now;
-  if (camp.status === "active" && camp.goalAmount > 0 && amount >= camp.goalAmount) {
+  if (camp.status === "active" && camp.goalAmount > 0 && totalRaised({ ...camp, raisedAmount: amount }) >= camp.goalAmount) {
     patch.status = "goal_reached";
     patch.goalReachedAt = now;
   }

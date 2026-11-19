@@ -6,8 +6,8 @@ import { Logo } from "@/components/logo";
 import { SplitTitle } from "@/components/motion";
 
 const COLS = [
-  { title: "Платформа", links: [["/explore", "Знайти збір"], ["/dashboard/campaigns/new", "Створити збір"], ["/communities", "Спільноти та челенджі"], ["/transparency", "Як ми перевіряємо"]] },
-  { title: "Для організацій", links: [["/pricing", "Тарифи"], ["/business", "Corporate Volunteerhub"], ["/support", "Підтримати платформу"]] },
+  { title: "Платформа", links: [["/explore", "Знайти збір"], ["/explore", "Відкрити допоміжну банку"], ["/communities", "Спільноти та челенджі"], ["/transparency", "Як ми перевіряємо"]] },
+  { title: "Для організацій", links: [["/dashboard/campaigns/new", "Заявка організації"], ["/pricing", "Тарифи"], ["/business", "Corporate Volunteerhub"], ["/support", "Підтримати платформу"]] },
   { title: "Акаунт", links: [["/login", "Увійти"], ["/register", "Реєстрація"], ["/dashboard", "Мій кабінет"]] },
 ];
 
@@ -21,7 +21,7 @@ export function SiteFooter() {
             Кожен важливий збір — помітний, прозорий і доступний, незалежно від того, хто його розпочав.
           </p>
           <p className="mt-4 text-[13px] leading-relaxed text-fg-subtle">
-            Volunteerhub не приймає й не зберігає донати. Кошти надходять напряму на банки Monobank організаторів.
+            Volunteerhub не приймає й не зберігає донати. Кошти надходять напряму на банки Monobank організацій і помічників.
           </p>
         </div>
         {COLS.map((c, i) => (

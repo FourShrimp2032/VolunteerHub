@@ -13,6 +13,8 @@ import { getDb } from "./db/client";
 import type { AppEnv, Env } from "./env";
 import { handleWebhook, pollConnections } from "./lib/monobank-live";
 import { pollPublicJars } from "./lib/monobank-public";
+import { pollHelperJars } from "./lib/helpers";
+import { helperRoutes } from "./routes/helpers";
 import { originGuard, sessionMiddleware } from "./lib/auth";
 import { CATEGORIES } from "./lib/constants";
 import { ACHIEVEMENTS, LEVELS, XP_RULES } from "./lib/gamification";
@@ -71,6 +73,7 @@ const api = new Hono<AppEnv>()
   .route("/auth", authRoutes)
   .route("/me", meRoutes)
   .route("/campaigns", campaignRoutes)
+  .route("/helpers", helperRoutes)
   .route("/files", fileRoutes)
   .route("/organizers", organizerRoutes)
   .route("/communities", communityRoutes)
@@ -126,7 +129,9 @@ export default {
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
     const db = getDb(env.DB);
     ctx.waitUntil(
-      Promise.all([pollConnections(db, env), pollPublicJars(db)]).then(([connected, publicJars]) => console.log("monobank poll", { connected, publicJars })),
+      Promise.all([pollConnections(db, env), pollPublicJars(db), pollHelperJars(db)]).then(([connected, publicJars, helpers]) =>
+        console.log("monobank poll", { connected, publicJars, helpers }),
+      ),
     );
   },
 };

@@ -12,7 +12,9 @@ import { api, uploadFile } from "@/lib/api";
 import { STATUS_LABELS } from "@/lib/categories";
 import { date, money, num, pct, shortDate, timeAgo } from "@/lib/format";
 import { useToast } from "@/lib/toast";
-import type { CampaignDetail } from "@/lib/types";
+import type { CampaignDetail, Helper } from "@/lib/types";
+import { TemplateEditor } from "@/components/template-editor";
+import { HelperPhoto } from "@/components/helper";
 
 type Stats = { totals: { views: number; followers: number; saves: number; shares: number; referredVisitors: number; donateClicks: number; progress: number }; days: { day: string; views: number }[] };
 
@@ -129,6 +131,18 @@ function Manage({ id }: { id: string }) {
 
       {c.hasJar && !c.isDemo && ["draft", "pending", "active", "goal_reached"].includes(c.status) && <MonobankCard c={c} onDone={load} />}
       {["active", "goal_reached"].includes(c.status) && c.raisedSource !== "monobank_jar" && <ProgressForm c={c} onDone={load} />}
+      {["draft", "rejected", "pending", "active", "goal_reached"].includes(c.status) && (
+        <TemplateEditor
+          key={c.template.fileId ?? "none"}
+          campaignId={c.id}
+          title={c.title}
+          orgName={c.template.orgName}
+          totalGoal={c.goalAmount}
+          initial={{ url: c.template.url, fileId: c.template.fileId ?? null, config: c.template.config, captionTemplate: c.template.captionTemplate, helpersInTotal: c.helpersInTotal }}
+          onSaved={load}
+        />
+      )}
+      {live && <HelpersManage c={c} onChange={load} />}
       {live && <UpdateForm c={c} onDone={load} />}
 
       {live && c.status !== "completed" && (
@@ -182,6 +196,62 @@ function ViewsChart({ days }: { days: Stats["days"] }) {
         <span>сьогодні</span>
       </div>
     </div>
+  );
+}
+
+/** Helper jars of this fundraiser; the organization can hide ones it doesn't recognise. */
+function HelpersManage({ c, onChange }: { c: CampaignDetail; onChange: () => void }) {
+  const [items, setItems] = React.useState<Helper[] | null>(null);
+  const [busy, setBusy] = React.useState<string | null>(null);
+  const toast = useToast();
+  const load = React.useCallback(() => api<{ items: Helper[] }>(`/helpers?campaign=${c.id}&all=1`).then((r) => setItems(r.items)).catch(() => setItems([])), [c.id]);
+  React.useEffect(() => {
+    load();
+  }, [load]);
+  if (!items) return <Skeleton className="h-32 rounded-2xl" />;
+  const shown = items.filter((h) => h.status !== "closed");
+  return (
+    <Card className="p-5 sm:p-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="font-semibold">Допоміжні банки · {shown.length}</p>
+        <p className="text-sm text-fg-muted">Разом {money(c.helpersRaised)}{!c.helpersInTotal ? " (не додається до загальної суми)" : ""}</p>
+      </div>
+      {shown.length === 0 ? (
+        <p className="mt-2 text-sm text-fg-muted">Поки немає. Поділіться збором: будь-хто може відкрити допоміжну банку на його сторінці.</p>
+      ) : (
+        <ul className="mt-4 divide-y divide-border">
+          {shown.map((h) => (
+            <li key={h.id} className="flex items-center gap-3 py-3">
+              <HelperPhoto h={h} className="size-11 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{h.displayName} {h.status === "hidden" && <Badge tone="warning">Приховано</Badge>}</p>
+                <p className="text-xs text-fg-subtle tabular-nums">{money(h.raisedAmount)} з {money(h.goalAmount)} · {h.viewCount ?? 0} переглядів · {h.donateClicks ?? 0} переходів</p>
+              </div>
+              <a href={h.jarUrl} target="_blank" rel="noopener noreferrer" className="hidden text-xs text-fg-muted hover:text-fg sm:inline">Банка ↗</a>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={busy === h.id}
+                onClick={async () => {
+                  setBusy(h.id);
+                  try {
+                    await api(`/helpers/${h.id}/visibility`, { method: "POST", json: { hidden: h.status !== "hidden" } });
+                    await load();
+                    onChange();
+                  } catch (e) {
+                    toast({ kind: "error", title: (e as Error).message });
+                  } finally {
+                    setBusy(null);
+                  }
+                }}
+              >
+                {h.status === "hidden" ? "Показати" : "Приховати"}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
   );
 }
 

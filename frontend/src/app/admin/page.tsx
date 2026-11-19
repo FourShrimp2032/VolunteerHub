@@ -7,6 +7,7 @@ import { CampaignCover, EmptyState } from "@/components/campaign";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Alert, Badge, Button, Card, Dialog, Field, Input, Segmented, Skeleton, Textarea } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
+import { ORG_KINDS } from "@/components/organization";
 import { categoryOf } from "@/lib/categories";
 import { date, money, timeAgo } from "@/lib/format";
 import { useToast } from "@/lib/toast";
@@ -164,7 +165,7 @@ function Campaigns({ onChange }: { onChange: () => void }) {
   );
 }
 
-type VReq = { id: string; userId: string; name: string; email: string; note: string; fileUrl: string | null; createdAt: number };
+type VReq = { id: string; userId: string; name: string; email: string; note: string; fileUrl: string | null; createdAt: number; kind: string; details: { name?: string; kind?: string; code?: string; website?: string } };
 
 function Verifications({ onChange }: { onChange: () => void }) {
   const [items, setItems] = React.useState<VReq[] | null>(null);
@@ -174,10 +175,10 @@ function Verifications({ onChange }: { onChange: () => void }) {
   React.useEffect(() => {
     load();
   }, [load]);
-  const decide = async (id: string, decision: "approved" | "rejected") => {
+  const decide = async (id: string, decision: "approved" | "rejected", org = false) => {
     try {
       await api(`/admin/verifications/${id}`, { method: "POST", json: { decision, note: notes[id] ?? "" } });
-      toast({ kind: "success", title: decision === "approved" ? "Особу підтверджено" : "Запит відхилено" });
+      toast({ kind: "success", title: decision === "approved" ? (org ? "Організацію підтверджено" : "Особу підтверджено") : "Запит відхилено" });
       load();
       onChange();
     } catch (e) {
@@ -193,8 +194,19 @@ function Verifications({ onChange }: { onChange: () => void }) {
         <Card key={r.id} className="p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-semibold">{r.name} <span className="font-normal text-fg-muted">· {r.email}</span></p>
-            <span className="text-xs text-fg-subtle">{date(r.createdAt)}</span>
+            <span className="flex items-center gap-2 text-xs text-fg-subtle">
+              <Badge tone={r.kind === "organization" ? "accent" : "outline"}>{r.kind === "organization" ? "Організація" : "Особа"}</Badge>
+              {date(r.createdAt)}
+            </span>
           </div>
+          {r.kind === "organization" && (
+            <dl className="mt-3 grid gap-x-6 gap-y-1 rounded-xl bg-subtle p-3 text-sm sm:grid-cols-2">
+              <div><dt className="inline text-fg-subtle">Назва: </dt><dd className="inline font-medium">{r.details.name}</dd></div>
+              <div><dt className="inline text-fg-subtle">Тип: </dt><dd className="inline">{ORG_KINDS[r.details.kind ?? ""] ?? r.details.kind}</dd></div>
+              {r.details.code && <div><dt className="inline text-fg-subtle">ЄДРПОУ: </dt><dd className="inline tabular-nums">{r.details.code}</dd></div>}
+              {r.details.website && <div className="truncate"><dt className="inline text-fg-subtle">Сайт: </dt><dd className="inline">{r.details.website}</dd></div>}
+            </dl>
+          )}
           <p className="mt-2 whitespace-pre-line text-sm text-fg-muted">{r.note}</p>
           {r.fileUrl && (
             <a href={r.fileUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm hover:bg-subtle">
@@ -204,7 +216,7 @@ function Verifications({ onChange }: { onChange: () => void }) {
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <Input placeholder="Коментар (необов'язково)" value={notes[r.id] ?? ""} onChange={(e) => setNotes({ ...notes, [r.id]: e.target.value })} className="h-9 text-sm" />
             <Button size="sm" variant="secondary" onClick={() => decide(r.id, "rejected")}><X /> Відхилити</Button>
-            <Button size="sm" onClick={() => decide(r.id, "approved")}><Check /> Підтвердити особу</Button>
+            <Button size="sm" onClick={() => decide(r.id, "approved", r.kind === "organization")}><Check /> {r.kind === "organization" ? "Підтвердити організацію" : "Підтвердити особу"}</Button>
           </div>
         </Card>
       ))}
