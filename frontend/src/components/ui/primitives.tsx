@@ -11,23 +11,23 @@ import { cn } from "@/lib/cn";
 import { Loader2 } from "lucide-react";
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold tracking-[-0.005em] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out disabled:pointer-events-none disabled:opacity-50 active:translate-y-px select-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "fill-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium tracking-[-0.01em] transition-[color,border-color,background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] select-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-accent text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_oklch(0.4_0.18_262/0.3),0_0_0_1px_oklch(0.47_0.2_262)] hover:bg-accent-hover",
-        sun: "bg-accent text-accent-fg hover:bg-accent-hover",
-        dark: "bg-ink text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.1),0_1px_2px_oklch(0.2_0.02_260/0.3)] hover:bg-[oklch(0.28_0.015_260)]",
-        secondary: "bg-surface text-fg border border-border shadow-card hover:border-border-strong hover:bg-subtle",
-        ghost: "text-fg-muted hover:text-fg hover:bg-muted",
-        soft: "bg-accent-soft text-accent hover:bg-[oklch(0.94_0.035_262)]",
-        danger: "bg-danger text-white hover:bg-danger/90",
-        link: "text-accent underline-offset-4 hover:underline px-0 h-auto",
+        primary: "bg-ink text-bg [--fill:var(--color-accent)]",
+        sun: "bg-accent text-white [--fill:var(--color-ink)]",
+        dark: "bg-ink text-bg [--fill:var(--color-accent)]",
+        secondary: "border border-fg/80 text-fg hover:text-bg",
+        ghost: "text-fg-muted hover:text-fg [--fill:var(--color-muted)]",
+        soft: "bg-accent-soft text-accent hover:text-white [--fill:var(--color-accent)]",
+        danger: "bg-danger text-white [--fill:var(--color-ink)]",
+        link: "text-accent underline-offset-4 hover:underline px-0 h-auto [&::before]:hidden",
       },
       size: {
-        sm: "h-8 rounded-md px-3 text-[13px]",
-        md: "h-10 px-4",
-        lg: "h-11 px-5 text-[15px]",
+        sm: "h-9 px-4 text-[13px]",
+        md: "h-11 px-5",
+        lg: "h-13 px-7 text-[15px]",
         icon: "h-10 w-10",
       },
     },
@@ -59,7 +59,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "h-11 w-full rounded-lg border border-border bg-surface px-3.5 text-[15px] text-fg placeholder:text-fg-subtle shadow-card transition hover:border-border-strong focus:border-accent focus:shadow-ring focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-danger",
+        "h-12 w-full rounded-xl border border-border-strong/70 bg-surface px-4 text-[15px] text-fg placeholder:text-fg-subtle transition-[border-color,box-shadow] duration-300 hover:border-fg/40 focus:border-fg focus:shadow-ring focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-danger",
         className,
       )}
       {...props}
@@ -72,7 +72,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
     <textarea
       ref={ref}
       className={cn(
-        "min-h-28 w-full rounded-lg border border-border bg-surface px-3.5 py-3 text-[15px] leading-relaxed text-fg placeholder:text-fg-subtle shadow-card transition hover:border-border-strong focus:border-accent focus:shadow-ring focus:outline-none",
+        "min-h-28 w-full rounded-xl border border-border-strong/70 bg-surface px-4 py-3 text-[15px] leading-relaxed text-fg placeholder:text-fg-subtle transition-[border-color,box-shadow] duration-300 hover:border-fg/40 focus:border-fg focus:shadow-ring focus:outline-none",
         className,
       )}
       {...props}
@@ -85,7 +85,7 @@ export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttrib
     <select
       ref={ref}
       className={cn(
-        "h-11 w-full appearance-none rounded-lg border border-border bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22 viewBox=%220 0 24 24%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:14px] bg-[right_12px_center] bg-no-repeat pl-3.5 pr-9 text-[15px] text-fg shadow-card transition focus:border-accent focus:shadow-ring focus:outline-none",
+        "h-12 w-full appearance-none rounded-xl border border-border-strong/70 bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22 viewBox=%220 0 24 24%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:14px] bg-[right_12px_center] bg-no-repeat pl-4 pr-9 text-[15px] text-fg transition-[border-color,box-shadow] duration-300 hover:border-fg/40 focus:border-fg focus:shadow-ring focus:outline-none",
         className,
       )}
       {...props}
@@ -118,18 +118,18 @@ export function Field({ label, hint, error, children, htmlFor }: { label: string
 
 export function Card({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("rounded-2xl border border-border bg-surface shadow-card", className)} {...rest}>
+    <div className={cn("rounded-2xl border border-border bg-surface", className)} {...rest}>
       {children}
     </div>
   );
 }
 
-const badgeVariants = cva("inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[12px] font-medium leading-[18px] [&_svg]:size-3.5", {
+const badgeVariants = cva("inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[12px] font-medium leading-[18px] [&_svg]:size-3.5", {
   variants: {
     tone: {
       neutral: "border-border bg-subtle text-fg-muted",
-      accent: "border-accent-border/60 bg-accent-soft text-accent",
-      success: "border-[oklch(0.88_0.06_158)] bg-success-soft text-[oklch(0.45_0.12_158)]",
+      accent: "border-accent-border bg-accent-soft text-accent",
+      success: "border-success/25 bg-success-soft text-success",
       warning: "border-[oklch(0.88_0.08_75)] bg-warning-soft text-[oklch(0.48_0.12_60)]",
       danger: "border-[oklch(0.89_0.06_25)] bg-danger-soft text-danger",
       gold: "border-[oklch(0.9_0.07_80)] bg-gold-soft text-gold-fg",
@@ -150,11 +150,11 @@ export function Badge({ tone, className, children, title }: VariantProps<typeof 
 
 export function Progress({ value, className, tone = "accent", size = "md", label }: { value: number; className?: string; tone?: "accent" | "success" | "gold"; size?: "sm" | "md" | "lg"; label?: string }) {
   const pct = Math.max(0, Math.min(100, value * 100));
-  const fill = tone === "success" ? "bg-success" : tone === "gold" ? "bg-gold" : "bg-accent";
+  const fill = tone === "success" ? "bg-success" : tone === "gold" ? "bg-gold" : "bg-signal";
   const h = size === "sm" ? "h-1" : size === "lg" ? "h-2.5" : "h-1.5";
   return (
-    <div className={cn("relative w-full overflow-hidden rounded-full bg-muted", h, className)} role="progressbar" aria-label={label ?? "Прогрес"} aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
-      <div className={cn("h-full origin-left rounded-full transition-[width] duration-700 ease-out animate-[grow-x_0.9s_cubic-bezier(0.2,0.7,0.2,1)_both]", fill)} style={{ width: `${pct}%` }} />
+    <div className={cn("relative w-full overflow-hidden rounded-full bg-fg/[0.07]", h, className)} role="progressbar" aria-label={label ?? "Прогрес"} aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+      <div className={cn("h-full origin-left rounded-full transition-[width] duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] animate-[grow-x_1.4s_cubic-bezier(0.22,1,0.36,1)_both]", fill)} style={{ width: `${pct}%` }} />
     </div>
   );
 }
@@ -165,7 +165,7 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function Segmented<T extends string>({ value, onChange, options, className }: { value: T; onChange: (v: T) => void; options: { value: T; label: React.ReactNode }[]; className?: string }) {
   return (
-    <div className={cn("inline-flex rounded-lg border border-border bg-muted/60 p-0.5", className)} role="tablist">
+    <div className={cn("inline-flex rounded-full border border-border bg-subtle p-1", className)} role="tablist">
       {options.map((o) => (
         <button
           key={o.value}
@@ -173,8 +173,8 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
           aria-selected={value === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "rounded-md px-3 py-1.5 text-[13px] font-medium transition",
-            value === o.value ? "bg-surface text-fg shadow-[0_1px_2px_oklch(0.2_0.02_260/0.08),0_0_0_1px_oklch(0.2_0.02_260/0.06)]" : "text-fg-muted hover:text-fg",
+            "rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-300",
+            value === o.value ? "bg-ink text-bg" : "text-fg-muted hover:text-fg",
           )}
         >
           {o.label}
@@ -188,12 +188,12 @@ export function Alert({ tone = "neutral", children, className, icon }: { tone?: 
   const tones = {
     neutral: "bg-subtle border-border text-fg-muted",
     danger: "bg-danger-soft border-[oklch(0.89_0.06_25)] text-danger",
-    success: "bg-success-soft border-[oklch(0.88_0.06_158)] text-[oklch(0.42_0.12_158)]",
+    success: "bg-success-soft border-success/25 text-success",
     warning: "bg-warning-soft border-[oklch(0.88_0.08_75)] text-[oklch(0.45_0.12_60)]",
-    accent: "bg-accent-soft border-accent-border/60 text-[oklch(0.45_0.18_262)]",
+    accent: "bg-accent-soft border-accent-border text-accent",
   } as const;
   return (
-    <div className={cn("flex gap-2.5 rounded-lg border px-3.5 py-3 text-sm leading-relaxed [&_svg]:mt-0.5 [&_svg]:size-4 [&_svg]:shrink-0", tones[tone], className)}>
+    <div className={cn("flex gap-2.5 rounded-xl border px-4 py-3 text-sm leading-relaxed [&_svg]:mt-0.5 [&_svg]:size-4 [&_svg]:shrink-0", tones[tone], className)}>
       {icon}
       <div className="min-w-0">{children}</div>
     </div>
@@ -210,9 +210,9 @@ export function Dialog({ open, onClose, title, children, footer }: { open: boole
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={title}>
-      <div className="absolute inset-0 bg-[oklch(0.2_0.02_260/0.32)] backdrop-blur-[3px] animate-fade-up" onClick={onClose} />
-      <div className="relative z-10 m-0 w-full max-w-lg animate-fade-up rounded-t-2xl border border-border bg-surface p-6 shadow-pop sm:m-4 sm:rounded-2xl">
-        <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="absolute inset-0 bg-ink/35 backdrop-blur-[4px] animate-[fade-up_0.4s_var(--ease)_both]" onClick={onClose} />
+      <div className="relative z-10 m-0 w-full max-w-lg animate-fade-up rounded-t-3xl border border-border bg-surface p-7 shadow-pop sm:m-4 sm:rounded-3xl">
+        <h3 className="text-[22px] font-medium tracking-[-0.03em]">{title}</h3>
         <div className="mt-4">{children}</div>
         {footer && <div className="mt-6 flex justify-end gap-2">{footer}</div>}
       </div>

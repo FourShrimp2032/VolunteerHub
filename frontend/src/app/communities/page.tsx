@@ -13,6 +13,7 @@ import { KINDS } from "@/lib/communities";
 import { num, plural } from "@/lib/format";
 import { useToast } from "@/lib/toast";
 import type { Challenge, Community } from "@/lib/types";
+import { RiseWords } from "@/components/motion";
 
 
 type Resp = { items: Community[]; leaderboard: { id: string; slug: string; name: string; kind: string; members: number; monthXp: number }[]; challenges: Challenge[] };
@@ -47,7 +48,7 @@ export default function CommunitiesPage() {
     <div className="container-page pt-8 sm:pt-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Спільноти та челенджі</h1>
+          <RiseWords as="h1" text="Спільноти та челенджі" className="text-balance text-[clamp(40px,6.2vw,92px)] font-medium leading-[0.98] tracking-[-0.05em]" />
           <p className="mt-3 text-fg-muted">Університети, студентські організації, компанії та волонтерські команди разом допомагають новим зборам знайти підтримку. Рейтинги рахують участь, а не гроші.</p>
         </div>
         <Button onClick={() => (user ? setOpen(true) : router.push("/login?next=/communities"))}><Plus /> Створити спільноту</Button>

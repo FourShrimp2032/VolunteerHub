@@ -1,27 +1,21 @@
 import { cn } from "@/lib/cn";
 
+/** Ink tile with a V and a signal-orange dot. The dot hops on hover of the parent `.group`. */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={cn("size-7", className)} aria-hidden>
-      <defs>
-        <linearGradient id="vh-mark" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="oklch(0.58 0.2 262)" />
-          <stop offset="1" stopColor="oklch(0.47 0.2 264)" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="8" fill="url(#vh-mark)" />
-      <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" fill="none" stroke="white" strokeOpacity="0.18" />
-      <path d="M9.5 11 16 21.5 22.5 11" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="16" cy="9.6" r="2.2" fill="white" />
+      <rect width="32" height="32" rx="9" fill="#0e0e0f" />
+      <path d="M9.5 12 16 22 22.5 12" fill="none" stroke="#f4f3ef" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="16" cy="9.4" r="2.3" fill="#ff4d1c" className="origin-center transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[1.5px]" />
     </svg>
   );
 }
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
-      <LogoMark className="size-[26px]" />
-      <span className="font-display text-[16px] font-bold tracking-[-0.035em]">Volunteerhub</span>
+    <span className={cn("group inline-flex items-center gap-2.5", className)}>
+      <LogoMark className="size-[26px] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-[-8deg]" />
+      <span className="text-[17px] font-semibold tracking-[-0.03em]">Volunteerhub</span>
     </span>
   );
 }

@@ -105,7 +105,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     <div className="container-page grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-10 lg:grid-cols-2">
       <div className="mx-auto w-full max-w-sm animate-fade-up">
         <LogoMark className="size-10" />
-        <h1 className="mt-6 text-[30px] font-extrabold tracking-[-0.035em]">{mode === "login" ? "З поверненням" : "Створіть акаунт"}</h1>
+        <h1 className="mt-6 animate-[fade-up_0.9s_var(--ease)_both] text-[clamp(36px,4vw,52px)] font-medium leading-[1] tracking-[-0.05em]">{mode === "login" ? "З поверненням" : "Створіть акаунт"}</h1>
         <p className="mt-2 text-fg-muted">
           {mode === "login" ? "Увійдіть, щоб стежити за зборами та керувати своїми." : "Один акаунт, щоб підтримувати збори й створювати власні."}
         </p>
@@ -156,7 +156,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
                 onSuccess={handleGoogleSuccess}
                 onError={() => setError("Помилка авторизації через Google.")}
                 text={mode === "login" ? "signin_with" : "signup_with"}
-                shape="rectangular"
+                shape="pill"
                 size="large"
                 width="384"
               />
@@ -174,9 +174,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       </div>
       <div className="relative hidden h-full min-h-[560px] overflow-hidden rounded-3xl border border-border bg-surface p-10 shadow-card lg:block">
         <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(70%_60%_at_100%_0%,black,transparent)]" aria-hidden />
-        <div className="pointer-events-none absolute right-[-160px] top-[-160px] size-[420px] rounded-full bg-[radial-gradient(closest-side,oklch(0.53_0.2_262/0.16),transparent)]" aria-hidden />
+        <div className="pointer-events-none absolute right-[-160px] top-[-160px] size-[420px] rounded-full bg-[radial-gradient(closest-side,rgb(255_77_28/0.10),transparent)]" aria-hidden />
         <div className="relative flex h-full flex-col justify-between gap-10">
-          <p className="max-w-sm pt-2 font-display text-[32px] font-extrabold leading-[1.1] tracking-[-0.04em]">Допомога, яку <span className="text-gradient">видно</span> від першої гривні до звіту.</p>
+          <p className="max-w-sm pt-2 text-[40px] font-medium leading-[1.05] tracking-[-0.045em]">Допомога, яку <span className="text-gradient">видно</span> від першої гривні до звіту.</p>
           <div className="grid gap-3">
             {[
               { icon: HandHeart, t: "Донати напряму", d: "Ми не торкаємося грошей. Кнопка веде на офіційну банку Monobank." },

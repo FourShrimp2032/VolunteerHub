@@ -30,7 +30,7 @@ export default function OrganizerPage() {
           <div className="flex items-end gap-5">
             <Avatar name={o.name} src={o.avatarUrl} size={96} className="ring-4 ring-surface" />
             <div className="min-w-0 pb-1">
-              <h1 className="flex flex-wrap items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+              <h1 className="flex animate-[fade-up_0.9s_var(--ease)_both] flex-wrap items-center gap-2 text-[clamp(30px,4vw,52px)] font-medium leading-[1] tracking-[-0.045em]">
                 {o.name} {o.identityVerified && <BadgeCheck className="size-6 text-accent" aria-label="Особу перевірено" />}
               </h1>
               <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-fg-muted">

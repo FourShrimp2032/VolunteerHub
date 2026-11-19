@@ -10,6 +10,7 @@ import { CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/cn";
 import { num, plural } from "@/lib/format";
 import type { CampaignCard } from "@/lib/types";
+import { RiseWords } from "@/components/motion";
 
 const SORTS = [
   { value: "recommended", label: "Рекомендовані" },
@@ -90,7 +91,7 @@ function Explore() {
   return (
     <div className="container-page pt-8 sm:pt-12">
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Знайдіть збір, якому потрібна ваша допомога</h1>
+        <RiseWords as="h1" text="Знайдіть збір, якому потрібна ваша допомога" className="max-w-4xl text-balance text-[clamp(40px,6.2vw,92px)] font-medium leading-[0.98] tracking-[-0.05em]" />
         <p className="mt-3 text-fg-muted">«Рекомендовані» враховують новизну, малу кількість переглядів, перевірки, терміновість і близькість до цілі. Не лише популярність.</p>
       </div>
 
