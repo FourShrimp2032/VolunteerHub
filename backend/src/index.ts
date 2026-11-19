@@ -95,9 +95,15 @@ app.all("*", async (c) => {
   if (!c.env.ASSETS) return c.text("Frontend is served by `next dev` in local development (http://localhost:3000).", 404);
   const url = new URL(c.req.url);
   const parts = url.pathname.split("/").filter(Boolean);
-  // Also covers Next.js RSC payloads, e.g. /campaigns/<slug>/__next._tree.txt
-  if (parts.length >= 2 && DYNAMIC_PREFIXES.includes(parts[0]) && parts[1] !== "_") {
-    url.pathname = ["", parts[0], "_", ...parts.slice(2)].join("/");
+  // `/communities/__next._tree.txt` etc. belong to the static index page, not to a slug.
+  if (parts.length >= 2 && DYNAMIC_PREFIXES.includes(parts[0]) && parts[1] !== "_" && !parts[1].startsWith("__next.")) {
+    // Client-side navigation asks for RSC payloads (/campaigns/<slug>/__next._tree.txt?_rsc=…).
+    // The exported payload belongs to the "_" placeholder, and its params don't match the real
+    // URL, so the router hangs or renders a blank page. Answering 404 makes Next.js fall back
+    // to a full page load, which serves the placeholder HTML below and always works.
+    const isRsc = url.searchParams.has("_rsc") || c.req.header("rsc") === "1" || parts.length > 2 || parts[1].endsWith(".txt");
+    if (isRsc) return new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });
+    url.pathname = ["", parts[0], "_"].join("/");
     const res = await c.env.ASSETS.fetch(new Request(url.toString(), c.req.raw));
     return new Response(res.body, res);
   }
