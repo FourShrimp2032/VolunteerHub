@@ -259,6 +259,11 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
               <span className="mr-1.5 inline-flex translate-y-[-1px] items-center gap-1.5 align-middle text-fg-muted"><span className="pulse !size-1.5" aria-hidden />Наживо з банки Monobank</span>
               {c.raisedUpdatedAt ? `оновлено ${timeAgo(c.raisedUpdatedAt)}` : ""}. Сума оновлюється автоматично після кожного донату.
             </>
+          ) : c.raisedSource === "monobank_public" ? (
+            <>
+              <span className="mr-1 text-fg-muted">З банки Monobank,</span>
+              {c.raisedUpdatedAt ? `оновлено ${timeAgo(c.raisedUpdatedAt)}` : ""}. Сума оновлюється автоматично кожні кілька хвилин.
+            </>
           ) : (
             <>Сума за даними організатора{c.raisedUpdatedAt ? `, оновлено ${timeAgo(c.raisedUpdatedAt)}` : ""}.</>
           )}

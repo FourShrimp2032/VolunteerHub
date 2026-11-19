@@ -94,7 +94,7 @@ export const campaigns = sqliteTable(
     /** Amount raised. Synced from the Monobank jar when possible, otherwise reported by the organizer. */
     raisedAmount: integer("raised_amount").notNull().default(0),
     raisedUpdatedAt: integer("raised_updated_at"),
-    /** "organizer" (typed in by the organizer) | "jar" (read from the public Monobank jar page). */
+    /** "organizer" (typed in) | "jar" (official personal API + webhook) | "jar_public" (public jar page, polled). */
     raisedSource: text("raised_source").notNull().default("organizer"),
     deadline: integer("deadline"),
     urgent: integer("urgent", { mode: "boolean" }).notNull().default(false),

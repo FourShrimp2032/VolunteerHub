@@ -30,6 +30,7 @@ import { campaignCards, fileUrl, loadCampaignBySlugOrId, publicUser, toCard, ver
 import { dayKey, newId, parseJsonArray, randomToken, sha256Hex, slugify } from "../lib/util";
 import { body } from "../lib/validate";
 import { connectCampaign, connectionStatus, disconnectCampaign, MonoError } from "../lib/monobank-live";
+import { canPollPublic, PUBLIC_VIEW_STALE_MS, pollPublicJar } from "../lib/monobank-public";
 import { monobankConnections } from "../db/schema";
 
 const budgetSchema = z.array(z.object({ label: z.string().trim().min(1, "Вкажіть назву статті бюджету").max(120), amount: z.number().int().min(0).max(1_000_000_000) })).max(30);
@@ -265,6 +266,14 @@ export const campaignRoutes = new Hono<AppEnv>()
     const user = c.get("user");
     const camp = await loadCampaignBySlugOrId(db, c.req.param("key"));
     if (!camp || !canView(camp, user)) return c.json({ error: "Збір не знайдено." }, 404);
+    // Stale token-less total: refresh in the background so the next view (or reload) is current.
+    if (canPollPublic(camp) && (camp.raisedSource !== "jar_public" || !camp.raisedUpdatedAt || Date.now() - camp.raisedUpdatedAt > PUBLIC_VIEW_STALE_MS)) {
+      try {
+        c.executionCtx.waitUntil(pollPublicJar(db, camp));
+      } catch {
+        /* no execution context (tests) */
+      }
+    }
     const [org] = await db.select().from(users).where(eq(users.id, camp.organizerId));
     const updates = await db.select().from(campaignUpdates).where(eq(campaignUpdates.campaignId, camp.id)).orderBy(desc(campaignUpdates.createdAt));
     const budget = await db.select().from(budgetItems).where(eq(budgetItems.campaignId, camp.id)).orderBy(asc(budgetItems.position));

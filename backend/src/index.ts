@@ -12,6 +12,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { getDb } from "./db/client";
 import type { AppEnv, Env } from "./env";
 import { handleWebhook, pollConnections } from "./lib/monobank-live";
+import { pollPublicJars } from "./lib/monobank-public";
 import { originGuard, sessionMiddleware } from "./lib/auth";
 import { CATEGORIES } from "./lib/constants";
 import { ACHIEVEMENTS, LEVELS, XP_RULES } from "./lib/gamification";
@@ -121,9 +122,12 @@ app.all("*", async (c) => {
 
 export default {
   fetch: app.fetch,
-  /** Cron (see infra/cloudflare/wrangler.toml): fallback poll of connected Monobank jars. */
+  /** Cron (see infra/cloudflare/wrangler.toml): connected jars (fallback) and token-less public jar reads. */
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(pollConnections(getDb(env.DB), env).then((r) => console.log("monobank poll", r)));
+    const db = getDb(env.DB);
+    ctx.waitUntil(
+      Promise.all([pollConnections(db, env), pollPublicJars(db)]).then(([connected, publicJars]) => console.log("monobank poll", { connected, publicJars })),
+    );
   },
 };
 export type ApiType = typeof api;
