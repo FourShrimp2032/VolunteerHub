@@ -1,6 +1,6 @@
 // Live smoke test of the main user flows. Usage: node smoke.cjs <baseUrl> "<command that makes EMAIL an admin>"
 // Test accounts use @volunteerhub.test e-mails and are removed afterwards by cleanup.sql.
-// E2E: register → create campaign via wizard → submit → (admin approves) → visitor follows/shares → logout/login
+// E2E: register → non-organizations get the organization application → (as admin) create campaign via wizard → submit → approve → visitor follows/shares → logout/login
 const { chromium } = require('playwright');
 const { execSync } = require('child_process');
 const base = process.argv[2] || 'http://localhost:8788';
@@ -22,6 +22,10 @@ require('fs').mkdirSync('screenshots', { recursive: true });
   await p.goto(base + '/register');
   await p.fill('#name', org.name); await p.fill('#email', org.email); await p.fill('#password', org.pw);
   await p.click('button[type=submit]'); await p.waitForURL(/\/dashboard/); log('registered', org.email);
+  // Only verified organizations (or admins) create fundraisers.
+  await p.goto(base + '/dashboard/campaigns/new');
+  await p.getByText('Заявка організації').first().waitFor(); log('regular user sees the organization application instead of the wizard');
+  execSync(makeAdmin.replace('EMAIL', org.email), { stdio: 'ignore' }); log('promoted to admin (may create fundraisers)');
   // Wizard
   await p.goto(base + '/dashboard/campaigns/new');
   await p.getByPlaceholder('Наприклад: Генератор').fill('E2E тест: павербанки для медиків');
@@ -39,6 +43,8 @@ require('fs').mkdirSync('screenshots', { recursive: true });
   await p.getByText('Формат правильний').waitFor();
   await p.getByRole('button', { name: /Далі/ }).click();
   await p.getByText('Підтверджувальні документи').waitFor();
+  await p.getByRole('button', { name: /Далі/ }).click();
+  await p.getByText('Шаблон для допоміжних банок').first().waitFor(); log('helping-jar template step shown');
   await p.getByRole('button', { name: /Далі/ }).click();
   await p.getByRole('button', { name: /Надіслати на модерацію/ }).click();
   await p.waitForURL(/manage\?id=/); const cid = new URL(p.url()).searchParams.get('id'); log('campaign submitted', cid);
@@ -66,6 +72,7 @@ require('fs').mkdirSync('screenshots', { recursive: true });
   await v.goto(base + '/campaigns/' + slug);
   await v.getByText('E2E тест: павербанки').first().waitFor();
   await v.getByText('Мету збору перевірено').first().waitFor();
+  await v.locator('a', { hasText: 'Відкрити допоміжну банку' }).first().waitFor(); log('helping-jar button shown to visitors');
   const href = await v.locator('a', { hasText: 'Підтримати через Monobank' }).first().getAttribute('href'); log('public visitor sees campaign; donate link', href);
   const loc = await v.evaluate((h) => fetch(h, { redirect: 'manual' }).then(r => r.type + ' ' + r.status), href); assert(loc.startsWith('opaqueredirect'), 'donate must redirect'); log('donate redirect', loc);
   // Visitor registers and follows
@@ -85,7 +92,7 @@ require('fs').mkdirSync('screenshots', { recursive: true });
   await v.screenshot({ path: 'screenshots/dashboard-mobile.png', fullPage: true });
   // Organizer posts update + progress
   await p.goto(base + '/dashboard/campaigns/manage?id=' + cid);
-  await p.getByLabel('Зібрана сума').fill('5000'); await p.getByRole('button', { name: 'Зберегти' }).click();
+  await p.getByLabel('Зібрана сума').fill('5000'); await p.getByRole('button', { name: 'Зберегти', exact: true }).click();
   await p.getByText('Суму оновлено').waitFor(); log('progress updated');
   await p.getByPlaceholder('Що нового?').fill('Перші павербанки замовлено');
   await p.getByPlaceholder(/Розкажіть, що зроблено/).fill('Замовили перші два павербанки у постачальника.');

@@ -6,6 +6,8 @@ DELETE FROM campaign_views WHERE campaign_id IN (SELECT id FROM campaigns WHERE 
 DELETE FROM follows WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test') OR campaign_id IN (SELECT id FROM campaigns WHERE organizer_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test'));
 DELETE FROM saves WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test');
 DELETE FROM shares WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test');
+DELETE FROM helper_jars WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test') OR campaign_id IN (SELECT id FROM campaigns WHERE organizer_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test'));
+DELETE FROM verification_requests WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test');
 DELETE FROM campaigns WHERE organizer_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test');
 DELETE FROM xp_events WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test');
 DELETE FROM user_achievements WHERE user_id IN (SELECT id FROM users WHERE email LIKE 'e2e-%@volunteerhub.test');
