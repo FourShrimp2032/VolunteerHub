@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { OAuth2Client } from "google-auth-library";
 import { buildSections, scoreCampaign } from "../src/lib/discovery";
 import { levelForXp } from "../src/lib/gamification";
 import { parseJarUrl } from "../src/lib/monobank";
@@ -70,5 +71,17 @@ describe("uploads", () => {
 describe("slugify", () => {
   it("transliterates Ukrainian", () => {
     expect(slugify("Генератор для лікарні")).toBe("henerator-dlia-likarni");
+  });
+});
+
+describe("google auth", () => {
+  it("verifies and rejects malformed google tokens", async () => {
+    const client = new OAuth2Client("994822121085-m28q8e8mlvb1vudambms6ejlr3934l5o.apps.googleusercontent.com");
+    await expect(
+      client.verifyIdToken({
+        idToken: "invalid-token-header.invalid-payload.invalid-sig",
+        audience: "994822121085-m28q8e8mlvb1vudambms6ejlr3934l5o.apps.googleusercontent.com",
+      })
+    ).rejects.toThrow();
   });
 });

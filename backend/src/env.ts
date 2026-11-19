@@ -16,6 +16,8 @@ export interface Env {
   ENVIRONMENT?: string;
   /** Extra allowed origins for state-changing requests (comma-separated), e.g. http://localhost:3000 */
   ALLOWED_ORIGINS?: string;
+  /** Google OAuth Client ID for verifying Google ID tokens. */
+  GOOGLE_CLIENT_ID?: string;
 }
 
 export type AppEnv = {

@@ -1,13 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { AuthProvider } from "@/lib/auth";
 import { ToastProvider } from "@/lib/toast";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter", display: "swap" });
-const manrope = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-manrope", display: "swap", weight: ["500", "600", "700", "800"] });
 
 export const metadata: Metadata = {
   title: { default: "Volunteerhub — кожен важливий збір помітний", template: "%s · Volunteerhub" },
@@ -20,7 +16,7 @@ export const viewport: Viewport = { themeColor: "#0B1A12", width: "device-width"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="uk" className={`${inter.variable} ${manrope.variable}`}>
+    <html lang="uk">
       <body className="min-h-dvh">
         <AuthProvider>
           <ToastProvider>

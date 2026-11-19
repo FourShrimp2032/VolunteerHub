@@ -4,11 +4,17 @@ import { ArrowRight, BadgeCheck, Eye, EyeOff, HandHeart, Sparkles } from "lucide
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
+import { CredentialResponse, GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { LogoMark } from "@/components/logo";
 import { Alert, Button, Field, Input } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { Me } from "@/lib/types";
+
+const GOOGLE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  process.env.GOOGLE_CLIENT_ID ||
+  "994822121085-m28q8e8mlvb1vudambms6ejlr3934l5o.apps.googleusercontent.com";
 
 function safeNext(next: string | null) {
   // Only allow same-site relative paths (no open redirects).
@@ -64,6 +70,37 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      setError("Не вдалося отримати токен від Google.");
+      return;
+    }
+    setError(null);
+    setBusy(true);
+    try {
+      let ref: string | undefined;
+      try {
+        ref = localStorage.getItem("vh_ref") ?? undefined;
+      } catch {
+        ref = undefined;
+      }
+      const r = await api<{ user: Me }>("/auth/google", {
+        method: "POST",
+        json: {
+          credential: credentialResponse.credential,
+          id_token: credentialResponse.credential,
+          ref,
+        },
+      });
+      setUser(r.user);
+      router.replace(next);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="container-page grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-10 lg:grid-cols-2">
       <div className="mx-auto w-full max-w-sm animate-fade-up">
@@ -103,6 +140,30 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             {mode === "login" ? "Увійти" : "Зареєструватися"} <ArrowRight />
           </Button>
         </form>
+
+        <div className="mt-6">
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <span className="relative bg-bg px-3 text-xs uppercase tracking-wider text-fg-subtle">
+              або
+            </span>
+          </div>
+          <div className="mt-5 flex justify-center">
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID} locale="uk">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Помилка авторизації через Google.")}
+                text={mode === "login" ? "signin_with" : "signup_with"}
+                shape="rectangular"
+                size="large"
+                width="384"
+              />
+            </GoogleOAuthProvider>
+          </div>
+        </div>
+
         <p className="mt-6 text-center text-sm text-fg-muted">
           {mode === "login" ? (
             <>Ще немає акаунта? <Link href={`/register${sp.get("next") ? `?next=${encodeURIComponent(next)}` : ""}`} className="font-medium text-accent hover:underline">Зареєструватися</Link></>

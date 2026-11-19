@@ -6,6 +6,7 @@
  * so the browser talks to the API on the same origin with an HttpOnly cookie.
  */
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
 import type { AppEnv } from "./env";
@@ -22,7 +23,22 @@ import { fileRoutes } from "./routes/files";
 import { meRoutes } from "./routes/me";
 
 const api = new Hono<AppEnv>()
-  .use("*", secureHeaders({ crossOriginResourcePolicy: "same-origin" }))
+  .use("*", async (c, next) => {
+    const self = new URL(c.req.url).origin;
+    const allowed = new Set([
+      self,
+      "http://localhost:3000",
+      "http://localhost:5173",
+      ...(c.env.ALLOWED_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+    ]);
+    return cors({
+      origin: (origin) => (allowed.has(origin) ? origin : null),
+      credentials: true,
+      allowHeaders: ["Content-Type", "Authorization", "Cookie"],
+      allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    })(c, next);
+  })
+  .use("*", secureHeaders({ crossOriginResourcePolicy: "cross-origin" }))
   .use("*", originGuard)
   .use("*", sessionMiddleware)
   .use("*", async (c, next) => {

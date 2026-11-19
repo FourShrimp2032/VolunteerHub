@@ -108,7 +108,12 @@ export const originGuard: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
     const origin = c.req.header("origin");
     const self = new URL(c.req.url).origin;
-    const allowed = new Set([self, ...(c.env.ALLOWED_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean)]);
+    const allowed = new Set([
+      self,
+      "http://localhost:3000",
+      "http://localhost:5173",
+      ...(c.env.ALLOWED_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+    ]);
     if (origin && !allowed.has(origin)) throw new HTTPException(403, { message: "Запит з недозволеного джерела." });
   }
   await next();
