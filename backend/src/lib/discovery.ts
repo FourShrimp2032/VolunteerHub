@@ -16,8 +16,15 @@ export type RankInput = Pick<
 
 export type RankContext = { now: number; interests: string[]; followedIds?: Set<string> };
 
-export function progressOf(c: { goalAmount: number; raisedAmount: number }) {
-  return c.goalAmount > 0 ? Math.min(1, c.raisedAmount / c.goalAmount) : 0;
+type Raised = { goalAmount: number; raisedAmount: number; helpersRaised?: number; helpersInTotal?: boolean };
+
+/** The organization's own jar plus its helping jars (unless helpers transfer into the main jar). */
+export function totalRaised(c: Raised) {
+  return c.raisedAmount + (c.helpersInTotal === false ? 0 : (c.helpersRaised ?? 0));
+}
+
+export function progressOf(c: Raised) {
+  return c.goalAmount > 0 ? Math.min(1, totalRaised(c) / c.goalAmount) : 0;
 }
 
 export function scoreCampaign(c: RankInput, ctx: RankContext) {

@@ -81,7 +81,7 @@ function Hero({ data }: { data: Home | null }) {
       <div className="mt-10 grid gap-8 border-t border-border pt-7 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
         <div className="grid gap-7 md:grid-cols-[minmax(0,32ch)_minmax(0,1fr)] md:items-end md:gap-12">
           <p className="reveal text-pretty text-[clamp(18px,1.8vw,22px)] leading-[1.35] tracking-[-0.01em]" style={d(700)}>
-            Збори з Telegram, Instagram і чатів в одному місці. Знайдіть, перевірте й побачте звіт про результат.
+            Перевірені збори організацій і допоміжні банки спільноти. Оберіть збір, відкрийте свою банку за 3 кроки й поділіться.
           </p>
           <form
             role="search"
@@ -224,23 +224,23 @@ function Manifesto() {
 function HowItWorks() {
   const cols = [
     {
-      title: "Для донорів",
+      title: "Для помічників",
       href: "/explore",
-      cta: "Знайти збір",
+      cta: "Обрати збір",
       items: [
-        { t: "Знайдіть збір", d: "Пошук, категорії та підбірки, що піднімають нові збори і збори з малою аудиторією." },
-        { t: "Перевірте", d: "Позначки перевірок, бюджет, документи й історія звітів організатора." },
-        { t: "Підтримайте напряму", d: "Кнопка веде на офіційну банку Monobank. Ми не торкаємося ваших грошей." },
+        { t: "Оберіть перевірений збір", d: "Основні збори публікують лише організації, яких перевірив модератор." },
+        { t: "Відкрийте банку за 3 кроки", d: "Ім'я й ціль, фото, посилання на вашу банку Monobank. Кожна гривня зараховується вам і збору." },
+        { t: "Поділіться в Stories", d: "Готове зображення в стилі збору з вашим фото й «Моя ціль», текст допису та кнопка для Instagram." },
       ],
     },
     {
-      title: "Для організаторів",
+      title: "Для організацій",
       href: "/dashboard/campaigns/new",
-      cta: "Створити збір",
+      cta: "Подати заявку",
       items: [
-        { t: "Створіть збір за 5 кроків", d: "Опис, ціль, бюджет, банка Monobank і документи." },
-        { t: "Пройдіть модерацію", d: "Перевірені збори отримують позначки довіри. Їх неможливо купити." },
-        { t: "Звітуйте", d: "Публікуйте оновлення, чеки й фінальний звіт. Донори бачать результат." },
+        { t: "Пройдіть перевірку організації", d: "Документи бачить лише модератор. Позначку довіри неможливо купити." },
+        { t: "Створіть збір і шаблон", d: "Опис, ціль, банка Monobank, документи й стокове зображення для помічників." },
+        { t: "Ростіть через спільноту й звітуйте", d: "Десятки допоміжних банок діляться вашим збором. Публікуйте чеки й фінальний звіт." },
       ],
     },
   ];
@@ -316,7 +316,7 @@ function Trust() {
           ))}
         </ol>
         <p className="reveal mt-8 max-w-2xl text-[14px] leading-relaxed text-fg-subtle">
-          Суми зібраного завжди позначені як дані організатора, бо в Monobank немає офіційного API для балансу банки.
+          Суми зібраного оновлюються з банок Monobank автоматично, а сума збору складається з банки організації та всіх допоміжних банок.
         </p>
       </div>
     </section>
@@ -385,15 +385,15 @@ function FinalCta() {
   return (
     <section className="container-page pt-[clamp(120px,16vw,240px)]">
       <p className="reveal mono text-[12px] uppercase tracking-[0.08em] text-fg-subtle">Безкоштовно для волонтерів</p>
-      <SplitTitle as="h2" mode="scroll" lines={["Ваш збір", "заслуговує уваги."]} className="mt-5 text-[clamp(46px,9vw,150px)] font-medium leading-[0.92] tracking-[-0.055em]" />
+      <SplitTitle as="h2" mode="scroll" lines={["Великий збір —", "це багато малих."]} className="mt-5 text-[clamp(46px,9vw,150px)] font-medium leading-[0.92] tracking-[-0.055em]" />
       <div className="mt-12 grid gap-10 border-t border-border pt-8 md:grid-cols-[minmax(0,40ch)_1fr] md:items-start">
-        <RiseWords as="p" text="Підключіть свою банку Monobank. Нові збори з малою аудиторією отримують додаткову видимість." className="text-[18px] leading-[1.4] text-fg-muted" />
+        <RiseWords as="p" text="Оберіть перевірений збір, відкрийте свою банку за 3 кроки й поділіться готовим зображенням у Stories." className="text-[18px] leading-[1.4] text-fg-muted" />
         <div className="reveal flex flex-wrap gap-3 md:justify-end" style={d(200)}>
-          <ButtonLink href="/dashboard/campaigns/new" size="lg" className="magnetic">
-            Створити збір <span className="arrow"><ArrowRight /></span>
+          <ButtonLink href="/explore" size="lg" className="magnetic">
+            Відкрити банку <span className="arrow"><ArrowRight /></span>
           </ButtonLink>
-          <ButtonLink href="/explore" size="lg" variant="secondary" className="magnetic">
-            Знайти збір <span className="arrow"><ArrowRight /></span>
+          <ButtonLink href="/dashboard/campaigns/new" size="lg" variant="secondary" className="magnetic">
+            Для організацій <span className="arrow"><ArrowRight /></span>
           </ButtonLink>
         </div>
       </div>

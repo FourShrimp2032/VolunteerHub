@@ -8,6 +8,7 @@ import { requireAdmin } from "../lib/auth";
 import { awardXp, evaluateProgress } from "../lib/gamification";
 import { campaignCards, privateUser } from "../lib/serialize";
 import { body } from "../lib/validate";
+import { totalRaised } from "../lib/discovery";
 
 export const adminRoutes = new Hono<AppEnv>()
   .use("*", async (c, next) => {
@@ -42,7 +43,7 @@ export const adminRoutes = new Hono<AppEnv>()
     await db
       .update(campaigns)
       .set({
-        status: camp.goalAmount > 0 && camp.raisedAmount >= camp.goalAmount ? "goal_reached" : "active",
+        status: camp.goalAmount > 0 && totalRaised(camp) >= camp.goalAmount ? "goal_reached" : "active",
         purposeReviewedAt: now,
         destinationVerifiedAt: input.destinationVerified ? now : null,
         publishedAt: camp.publishedAt ?? now,
@@ -77,7 +78,7 @@ export const adminRoutes = new Hono<AppEnv>()
       .where(eq(verificationRequests.status, c.req.query("status") ?? "pending"))
       .orderBy(desc(verificationRequests.createdAt))
       .limit(100);
-    return c.json({ items: rows.map(({ r, name, email }) => ({ ...r, name, email, fileUrl: r.fileId ? `/api/files/${r.fileId}` : null })) });
+    return c.json({ items: rows.map(({ r, name, email }) => ({ ...r, details: JSON.parse(r.details || "{}"), name, email, fileUrl: r.fileId ? `/api/files/${r.fileId}` : null })) });
   })
   .post("/verifications/:id", async (c) => {
     const admin = requireAdmin(c);
@@ -89,7 +90,18 @@ export const adminRoutes = new Hono<AppEnv>()
       .update(verificationRequests)
       .set({ status: input.decision, reviewNote: input.note, reviewerId: admin.id, reviewedAt: Date.now() })
       .where(eq(verificationRequests.id, r.id));
-    if (input.decision === "approved") await db.update(users).set({ identityVerifiedAt: Date.now() }).where(eq(users.id, r.userId));
+    if (input.decision === "approved") {
+      const now = Date.now();
+      if (r.kind === "organization") {
+        const d = JSON.parse(r.details || "{}") as { name?: string; kind?: string; code?: string; website?: string };
+        await db
+          .update(users)
+          .set({ identityVerifiedAt: now, orgVerifiedAt: now, orgName: d.name ?? null, orgKind: d.kind ?? null, orgCode: d.code || null, orgWebsite: d.website || null })
+          .where(eq(users.id, r.userId));
+      } else {
+        await db.update(users).set({ identityVerifiedAt: now }).where(eq(users.id, r.userId));
+      }
+    }
     return c.json({ ok: true });
   })
   .get("/reports", async (c) => {
@@ -135,7 +147,7 @@ export const adminRoutes = new Hono<AppEnv>()
   .post("/users/:id", async (c) => {
     const admin = requireAdmin(c);
     const db = getDb(c.env.DB);
-    const input = await body(c, z.object({ role: z.enum(["user", "admin"]).optional(), isBlocked: z.boolean().optional(), identityVerified: z.boolean().optional() }));
+    const input = await body(c, z.object({ role: z.enum(["user", "admin"]).optional(), isBlocked: z.boolean().optional(), identityVerified: z.boolean().optional(), orgVerified: z.boolean().optional() }));
     const id = c.req.param("id");
     if (id === admin.id && (input.role === "user" || input.isBlocked)) return c.json({ error: "Не можна змінити власну роль чи заблокувати себе." }, 400);
     await db
@@ -144,6 +156,7 @@ export const adminRoutes = new Hono<AppEnv>()
         ...(input.role && { role: input.role }),
         ...(input.isBlocked !== undefined && { isBlocked: input.isBlocked }),
         ...(input.identityVerified === false && { identityVerifiedAt: null }),
+        ...(input.orgVerified === false && { orgVerifiedAt: null }),
       })
       .where(eq(users.id, id));
     if (input.isBlocked) await db.delete(sessions).where(eq(sessions.userId, id));

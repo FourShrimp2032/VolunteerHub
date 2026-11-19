@@ -4,6 +4,8 @@ import { buildSections, scoreCampaign } from "../src/lib/discovery";
 import { levelForXp } from "../src/lib/gamification";
 import { parseJarUrl } from "../src/lib/monobank";
 import { canPollPublic, parsePublicJar } from "../src/lib/monobank-public";
+import { acceptsHelpers, DEFAULT_CAPTION, parseTemplateConfig, renderCaption, templateConfigSchema } from "../src/lib/helpers";
+import { progressOf, totalRaised } from "../src/lib/discovery";
 import { decryptToken, encryptToken, parseClientInfo, parseWebhookEvent, sendIdToJarId } from "../src/lib/monobank-live";
 import { sniffMime } from "../src/lib/storage";
 import { slugify } from "../src/lib/util";
@@ -82,6 +84,42 @@ describe("token-less jar polling", () => {
     expect(canPollPublic({ ...base, isDemo: true })).toBe(false);
     expect(canPollPublic({ ...base, status: "pending" })).toBe(false);
     expect(canPollPublic({ ...base, jarId: null })).toBe(false);
+  });
+});
+
+describe("helping jars", () => {
+  it("adds helper jars to the fundraiser total unless they transfer into the main jar", () => {
+    const c = { goalAmount: 10_000, raisedAmount: 4000, helpersRaised: 3000, helpersInTotal: true };
+    expect(totalRaised(c)).toBe(7000);
+    expect(progressOf(c)).toBeCloseTo(0.7);
+    expect(totalRaised({ ...c, helpersInTotal: false })).toBe(4000);
+    expect(totalRaised({ goalAmount: 1, raisedAmount: 5 })).toBe(5);
+  });
+  it("accepts helpers only on live, non-demo fundraisers", () => {
+    expect(acceptsHelpers({ status: "active", isDemo: false })).toBe(true);
+    expect(acceptsHelpers({ status: "goal_reached", isDemo: false })).toBe(true);
+    expect(acceptsHelpers({ status: "active", isDemo: true })).toBe(false);
+    expect(acceptsHelpers({ status: "pending", isDemo: false })).toBe(false);
+    expect(acceptsHelpers({ status: "completed", isDemo: false })).toBe(false);
+  });
+  it("validates template layouts and fills defaults", () => {
+    const cfg = templateConfigSchema.parse({ photo: { x: 0.5, y: 0.3, w: 0.42, h: 0.5 }, goal: { x: 0.05, y: 0.75, size: 0.07 } });
+    expect(cfg.photo.layer).toBe("over");
+    expect(cfg.goal).toMatchObject({ font: "Unbounded", layout: "inline", currency: "ГРН", uppercase: true });
+    expect(templateConfigSchema.safeParse({ photo: { x: 2, y: 0, w: 0.5, h: 0.5 }, goal: { x: 0, y: 0, size: 0.05 } }).success).toBe(false);
+    expect(templateConfigSchema.safeParse({ photo: { x: 0, y: 0, w: 0.5, h: 0.5 }, goal: { x: 0, y: 0, size: 0.05, font: "Comic Sans" } }).success).toBe(false);
+    expect(templateConfigSchema.safeParse({ photo: { x: 0, y: 0, w: 0.5, h: 0.5 }, goal: { x: 0, y: 0, size: 0.05, color: "red" } }).success).toBe(false);
+    expect(parseTemplateConfig("not json")).toBeNull();
+    expect(parseTemplateConfig(JSON.stringify(cfg))).toEqual(cfg);
+  });
+  it("renders captions from the organization's text or the default", () => {
+    const v = { title: "Пікап для 3 ОШБр", org: "БФ Приклад", goal: "3 500", total: "94 000", jar: "https://send.monobank.ua/jar/abc123XYZ", link: "https://vh.example/c/x?jar=h_1", name: "Олена" };
+    expect(renderCaption("{name}: моя ціль {goal} ₴ → {jar}", v)).toBe("Олена: моя ціль 3 500 ₴ → https://send.monobank.ua/jar/abc123XYZ");
+    const d = renderCaption("", v);
+    expect(d).toContain("«Пікап для 3 ОШБр» від БФ Приклад");
+    expect(d).toContain(v.link);
+    expect(DEFAULT_CAPTION).toContain("{goal}");
+    expect(renderCaption("{unknown} {goal}", v)).toBe("{unknown} 3 500");
   });
 });
 

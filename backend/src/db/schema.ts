@@ -26,6 +26,15 @@ export const users = sqliteTable(
     plan: text("plan").notNull().default("free"),
     /** Set only when an admin approved an identity verification request. */
     identityVerifiedAt: integer("identity_verified_at"),
+    /** Set when a moderator approved the account as an organization. Only organizations publish main fundraisers. */
+    orgVerifiedAt: integer("org_verified_at"),
+    /** Public organization details (filled from the approved application). */
+    orgName: text("org_name"),
+    /** charity_fund | ngo | military_unit | initiative | other */
+    orgKind: text("org_kind"),
+    /** ЄДРПОУ / registration code, when the organization has one. */
+    orgCode: text("org_code"),
+    orgWebsite: text("org_website"),
     /** JSON array of category slugs the user is interested in. */
     interests: text("interests").notNull().default("[]"),
     referralCode: text("referral_code").notNull(),
@@ -111,6 +120,16 @@ export const campaigns = sqliteTable(
     monoConnectionId: text("mono_connection_id"),
     /** Internal Monobank jar account id (not the public send id); webhook events are matched on it. */
     monoJarAccount: text("mono_jar_account"),
+    /** Organizer's stock image for helping jars and how a helper's photo and goal are placed on it (JSON, see lib/helpers.ts). */
+    templateFileId: text("template_file_id"),
+    templateConfig: text("template_config"),
+    /** Caption for helpers' posts; placeholders like {goal} and {link}. Empty: the default caption. */
+    captionTemplate: text("caption_template").notNull().default(""),
+    /** Cached sum of helping jars (whole UAH). */
+    helpersRaised: integer("helpers_raised").notNull().default(0),
+    helpersCount: integer("helpers_count").notNull().default(0),
+    /** false when helpers transfer into the organization's jar (their money is already in raisedAmount). */
+    helpersInTotal: integer("helpers_in_total", { mode: "boolean" }).notNull().default(true),
     viewCount: integer("view_count").notNull().default(0),
     donateClicks: integer("donate_clicks").notNull().default(0),
     isDemo: integer("is_demo", { mode: "boolean" }).notNull().default(false),
@@ -317,12 +336,54 @@ export const verificationRequests = sqliteTable(
     fileId: text("file_id"),
     /** pending | approved | rejected */
     status: text("status").notNull().default("pending"),
+    /** identity | organization */
+    kind: text("kind").notNull().default("identity"),
+    /** JSON: organization name, kind, code, website for organization applications. */
+    details: text("details").notNull().default("{}"),
     reviewerId: text("reviewer_id"),
     reviewNote: text("review_note"),
     reviewedAt: integer("reviewed_at"),
     createdAt: integer("created_at").notNull().default(now),
   },
   (t) => [index("verif_user_idx").on(t.userId)],
+);
+
+/**
+ * A helping jar (допоміжна банка): a person's own Monobank jar raising part of a verified
+ * organization's fundraiser. Money goes to the helper's jar; we track it and credit both.
+ */
+export const helperJars = sqliteTable(
+  "helper_jars",
+  {
+    id: text("id").primaryKey(),
+    campaignId: text("campaign_id").notNull(),
+    userId: text("user_id").notNull(),
+    displayName: text("display_name").notNull(),
+    goalAmount: integer("goal_amount").notNull(),
+    photoFileId: text("photo_file_id"),
+    /** JSON {x, y, zoom}: how the photo sits in the template's slot. */
+    photoCrop: text("photo_crop").notNull().default("{}"),
+    /** The generated share image (uploaded by the helper's browser). */
+    shareFileId: text("share_file_id"),
+    jarUrl: text("jar_url").notNull(),
+    jarId: text("jar_id").notNull(),
+    raisedAmount: integer("raised_amount").notNull().default(0),
+    raisedUpdatedAt: integer("raised_updated_at"),
+    /** organizer (nothing read yet) | jar_public */
+    raisedSource: text("raised_source").notNull().default("organizer"),
+    /** active | hidden (by the organization or a moderator) | closed (by the helper) */
+    status: text("status").notNull().default("active"),
+    goalReachedAt: integer("goal_reached_at"),
+    viewCount: integer("view_count").notNull().default(0),
+    donateClicks: integer("donate_clicks").notNull().default(0),
+    createdAt: integer("created_at").notNull().default(now),
+    updatedAt: integer("updated_at").notNull().default(now),
+  },
+  (t) => [
+    index("helper_campaign_idx").on(t.campaignId),
+    uniqueIndex("helper_user_campaign_uq").on(t.userId, t.campaignId),
+    index("helper_jar_idx").on(t.jarId),
+  ],
 );
 
 export const contentReports = sqliteTable("content_reports", {
@@ -387,3 +448,4 @@ export const monobankEvents = sqliteTable(
 export type MonobankConnection = typeof monobankConnections.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
+export type HelperJar = typeof helperJars.$inferSelect;

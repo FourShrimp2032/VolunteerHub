@@ -5,6 +5,7 @@ import Link from "next/link";
 import * as React from "react";
 import { CampaignCover, EmptyState } from "@/components/campaign";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { OrganizationApply } from "@/components/organization";
 import { StatTile } from "@/components/impact";
 import { Alert, Badge, ButtonLink, Card, Progress, Segmented, Skeleton } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
@@ -22,7 +23,7 @@ export default function OrganizerDashboard() {
       description="Керуйте зборами, публікуйте оновлення та звіти."
       actions={<ButtonLink href="/dashboard/campaigns/new"><Plus /> Створити збір</ButtonLink>}
     >
-      {() => <Body />}
+      {(user) => (user.isOrganization || user.role === "admin" ? <Body /> : <OrganizationApply />)}
     </DashboardShell>
   );
 }
@@ -39,7 +40,7 @@ function Body() {
       <EmptyState
         icon={<Plus />}
         title="У вас ще немає зборів"
-        description="Створіть перший збір за кілька хвилин. Знадобиться опис, ціль і посилання на вашу банку Monobank."
+        description="Створіть перший збір за кілька хвилин. Знадобиться опис, ціль, банка Monobank і стокове зображення для помічників."
         action={<ButtonLink href="/dashboard/campaigns/new">Створити збір</ButtonLink>}
       />
     );

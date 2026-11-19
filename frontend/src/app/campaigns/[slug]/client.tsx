@@ -15,7 +15,8 @@ import { categoryOf, STATUS_LABELS } from "@/lib/categories";
 import { cn } from "@/lib/cn";
 import { date, daysLeft, money, pct, plural, timeAgo } from "@/lib/format";
 import { useToast } from "@/lib/toast";
-import type { CampaignDetail, PublicUser } from "@/lib/types";
+import type { CampaignDetail, Helper, PublicUser } from "@/lib/types";
+import { HelperCard, HelperPhoto } from "@/components/helper";
 import { usePathParam } from "@/lib/use-path-param";
 
 type Resp = {
@@ -29,6 +30,18 @@ export default function CampaignPage() {
   const [data, setData] = React.useState<Resp | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { user } = useAuth();
+
+  const [focus, setFocus] = React.useState<{ helper: Helper; share: { link: string } } | null>(null);
+  React.useEffect(() => {
+    const jar = new URLSearchParams(window.location.search).get("jar");
+    if (!jar) return;
+    api<{ helper: Helper; share: { link: string } }>(`/helpers/${encodeURIComponent(jar.slice(0, 40))}`)
+      .then((r) => {
+        setFocus(r);
+        api(`/helpers/${r.helper.id}/view`, { method: "POST" }).catch(() => null);
+      })
+      .catch(() => null);
+  }, []);
 
   const load = React.useCallback(async () => {
     if (!slug) return;
@@ -87,6 +100,8 @@ export default function CampaignPage() {
         </Alert>
       )}
 
+      {focus && focus.helper.campaignId === c.id && <HelperHero h={focus.helper} title={c.title} />}
+
       <nav className="mb-5 flex items-center gap-2 text-[13px] text-fg-subtle">
         <Link href="/explore" className="hover:text-fg">Збори</Link>
         <span>/</span>
@@ -121,6 +136,12 @@ export default function CampaignPage() {
               ))}
             </div>
           </Section>
+
+          {(c.acceptsHelpers || c.helpers.length > 0) && (
+            <Section title="Допоміжні банки" count={c.helpersCount}>
+              <HelpersBlock c={c} isOwner={viewer.isOwner} />
+            </Section>
+          )}
 
           {c.budget.length > 0 && (
             <Section title="Бюджет">
@@ -202,6 +223,61 @@ export default function CampaignPage() {
   );
 }
 
+/** Shown when someone opens a helper's link (?jar=): their jar first, the fundraiser below. */
+function HelperHero({ h, title }: { h: Helper; title: string }) {
+  return (
+    <Card className="mb-8 overflow-hidden">
+      <div className="grid sm:grid-cols-[220px_1fr]">
+        <HelperPhoto h={h} className="aspect-[4/5] w-full sm:aspect-auto sm:h-full" />
+        <div className="flex flex-col justify-center gap-3 p-5 sm:p-7">
+          <p className="mono text-[11px] uppercase tracking-[0.08em] text-accent">Допоміжна банка</p>
+          <p className="text-balance text-[clamp(22px,3vw,32px)] font-medium leading-[1.1] tracking-[-0.03em]">
+            {h.displayName} збирає {money(h.goalAmount)} на «{title}»
+          </p>
+          <div>
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="font-semibold tabular-nums">{money(h.raisedAmount)}</span>
+              <span className="text-fg-subtle">{pct(h.progress)}</span>
+            </div>
+            <Progress value={h.progress} tone={h.goalReached ? "success" : "accent"} className="mt-2" />
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <a href={`/api/helpers/${h.id}/donate`} target="_blank" rel="noopener noreferrer nofollow" className={buttonVariants({ size: "lg" })}>
+              Задонатити в банку {h.displayName.split(" ")[0]} <ExternalLink />
+            </a>
+            <p className="text-xs text-fg-subtle">Кошти йдуть у банку помічника й зараховуються до збору нижче.</p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function HelpersBlock({ c, isOwner }: { c: CampaignDetail; isOwner: boolean }) {
+  return (
+    <div className="grid gap-5">
+      {c.acceptsHelpers && !isOwner && (
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-subtle p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold">Допоможіть зібрати швидше</p>
+            <p className="mt-1 text-sm leading-relaxed text-fg-muted">Відкрийте власну банку для цього збору за 3 кроки: ім'я й ціль, фото, посилання на банку. Отримаєте готове зображення для Stories.</p>
+          </div>
+          <ButtonLink href={`/help?c=${c.slug}`} className="shrink-0">Відкрити банку</ButtonLink>
+        </div>
+      )}
+      {c.helpers.length > 0 ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {c.helpers.map((h) => (
+            <HelperCard key={h.id} h={h} campaignSlug={c.slug} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-fg-muted">Ще ніхто не відкрив допоміжну банку. Будьте першими.</p>
+      )}
+    </div>
+  );
+}
+
 function Section({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
   return (
     <section className="mt-12">
@@ -251,6 +327,16 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
       </div>
       <p className="mt-0.5 text-sm text-fg-muted">зібрано з {money(c.goalAmount)}</p>
       <Progress value={c.progress} tone={c.progress >= 1 ? "success" : "accent"} size="lg" className="mt-4" />
+      {c.helpersCount > 0 && (
+        <dl className="mt-3 grid gap-1 text-[13px]">
+          <div className="flex justify-between gap-3"><dt className="text-fg-muted">Банка організації</dt><dd className="tabular-nums">{money(c.mainRaised)}</dd></div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-fg-muted">Допоміжні банки · {c.helpersCount}</dt>
+            <dd className="tabular-nums">{money(c.helpersRaised)}</dd>
+          </div>
+          {!c.helpersInTotal && <p className="text-[11.5px] text-fg-subtle">Помічники переказують кошти на банку організації, тому їхні суми не додаються вдруге.</p>}
+        </dl>
+      )}
       <p className="mt-2.5 flex items-start gap-1.5 text-xs leading-relaxed text-fg-subtle">
         <Info className="mt-px size-3.5 shrink-0" />
         <span>
@@ -296,6 +382,11 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
             {viewer.saved ? <BookmarkCheck /> : <Bookmark />} {viewer.saved ? "Збережено" : "Зберегти"}
           </Button>
         </div>
+        {c.acceptsHelpers && !viewer.isOwner && (
+          <ButtonLink href={`/help?c=${c.slug}`} variant="dark" size="lg" className="w-full">
+            <Sparkles /> Відкрити допоміжну банку
+          </ButtonLink>
+        )}
         {isPublic && <SharePanel c={c} referralCode={viewer.referralCode} />}
         {(viewer.isOwner || viewer.isAdmin) && (
           <ButtonLink href={`/dashboard/campaigns/manage?id=${c.id}`} variant="secondary" className="mt-1">

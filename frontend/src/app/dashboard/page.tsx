@@ -9,7 +9,10 @@ import { AchievementGrid, ChallengeCard, LevelCard, MissionList, StatTile } from
 import { Badge, ButtonLink, Card, Segmented, Skeleton } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
-import type { Achievement, CampaignCard, Challenge, Community, Level, Mission } from "@/lib/types";
+import type { Achievement, CampaignCard, Challenge, Community, Helper, Level, Mission } from "@/lib/types";
+import { HelperPhoto } from "@/components/helper";
+import { Progress } from "@/components/ui/primitives";
+import { money, pct } from "@/lib/format";
 
 type Dash = {
   level: Level;
@@ -59,6 +62,8 @@ function Body({ userName }: { userName: string }) {
         </Card>
       </div>
 
+      <MyHelperJars />
+
       <section>
         <h2 className="mb-4 text-lg font-bold">Особистий вплив</h2>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
@@ -70,7 +75,7 @@ function Body({ userName }: { userName: string }) {
           <StatTile icon={<Sparkles />} value={d.impact.xp} label="Impact XP" />
         </div>
         <p className="mt-3 text-xs text-fg-subtle">
-          Ми не показуємо суми ваших донатів. Volunteerhub не має надійних даних про транзакції, бо кошти йдуть напряму на банки організаторів.
+          Ми не показуємо суми ваших особистих донатів. Суми ваших допоміжних банок рахуються з їхнього балансу в Monobank.
         </p>
       </section>
 
@@ -173,5 +178,48 @@ function Body({ userName }: { userName: string }) {
         )}
       </section>
     </div>
+  );
+}
+
+type MyHelper = Helper & { campaign: { id: string; slug: string; title: string; status: string } };
+
+/** The helping jars this user opened, with what each has raised. */
+function MyHelperJars() {
+  const [items, setItems] = React.useState<MyHelper[] | null>(null);
+  React.useEffect(() => {
+    api<{ items: MyHelper[] }>("/helpers/mine").then((r) => setItems(r.items)).catch(() => setItems([]));
+  }, []);
+  if (!items) return null;
+  const open = items.filter((h) => h.status !== "closed");
+  const total = open.reduce((s, h) => s + h.raisedAmount, 0);
+  return (
+    <section>
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-lg font-bold">Мої допоміжні банки</h2>
+        {open.length > 0 && <p className="text-sm text-fg-muted">Зібрано через ваші банки: <b className="font-semibold text-fg tabular-nums">{money(total)}</b></p>}
+      </div>
+      {open.length === 0 ? (
+        <EmptyState icon={<Sparkles />} title="Ще немає допоміжних банок" description="Оберіть перевірений збір і відкрийте для нього власну банку за 3 кроки. Ми зробимо готове зображення для Stories." action={<ButtonLink href="/explore">Обрати збір</ButtonLink>} />
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          {open.map((h) => (
+            <Card key={h.id} className="flex gap-4 p-4">
+              <HelperPhoto h={h} className="h-24 w-20 shrink-0 rounded-xl" />
+              <div className="min-w-0 flex-1">
+                <Link href={`/campaigns/${h.campaign.slug}?jar=${h.id}`} className="line-clamp-1 text-sm font-semibold hover:underline">{h.campaign.title}</Link>
+                {h.status === "hidden" && <Badge tone="warning" className="mt-1">Приховано організацією</Badge>}
+                <div className="mt-2 flex items-baseline justify-between text-sm">
+                  <span className="font-semibold tabular-nums">{money(h.raisedAmount)}</span>
+                  <span className="text-fg-subtle tabular-nums">з {money(h.goalAmount)} · {pct(h.progress)}</span>
+                </div>
+                <Progress value={h.progress} size="sm" tone={h.goalReached ? "success" : "accent"} className="mt-1.5" />
+                <p className="mt-2 text-xs text-fg-subtle">{h.viewCount ?? 0} переглядів · {h.donateClicks ?? 0} переходів до банки{h.raisedUpdatedAt ? ` · оновлено ${timeAgo(h.raisedUpdatedAt)}` : ""}</p>
+                <ButtonLink href={`/help?id=${h.id}`} variant="secondary" size="sm" className="mt-3"><Share2 /> Поділитися</ButtonLink>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

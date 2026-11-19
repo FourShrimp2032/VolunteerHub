@@ -1,7 +1,8 @@
 import { eq, inArray } from "drizzle-orm";
 import type { DB } from "../db/client";
 import { campaignUpdates, campaigns, follows, users, type Campaign, type User } from "../db/schema";
-import { progressOf } from "./discovery";
+import { progressOf, totalRaised } from "./discovery";
+import { acceptsHelpers } from "./helpers";
 import { levelForXp } from "./gamification";
 
 export const fileUrl = (id: string | null | undefined) => (id ? `/api/files/${id}` : null);
@@ -9,11 +10,15 @@ export const fileUrl = (id: string | null | undefined) => (id ? `/api/files/${id
 export function publicUser(u: User) {
   return {
     id: u.id,
-    name: u.name,
+    name: u.orgName || u.name,
     bio: u.bio,
     city: u.city,
     avatarUrl: fileUrl(u.avatarFileId),
     identityVerified: !!u.identityVerifiedAt,
+    isOrganization: !!u.orgVerifiedAt,
+    orgName: u.orgName,
+    orgKind: u.orgKind,
+    orgWebsite: u.orgWebsite,
     isDemo: u.isDemo,
     plan: u.plan,
     createdAt: u.createdAt,
@@ -24,6 +29,8 @@ export function publicUser(u: User) {
 export function privateUser(u: User) {
   return {
     ...publicUser(u),
+    name: u.name,
+    orgCode: u.orgCode,
     email: u.email,
     role: u.role,
     interests: JSON.parse(u.interests || "[]") as string[],
@@ -75,7 +82,13 @@ export function toCard(c: Campaign, org: User | null, extra: { hasFinalReport: b
     city: c.city,
     coverUrl: fileUrl(c.coverFileId),
     goalAmount: c.goalAmount,
-    raisedAmount: c.raisedAmount,
+    /** Total shown to donors: the organization's jar plus helping jars (see totalRaised). */
+    raisedAmount: totalRaised(c),
+    mainRaised: c.raisedAmount,
+    helpersRaised: c.helpersRaised,
+    helpersCount: c.helpersCount,
+    helpersInTotal: c.helpersInTotal,
+    acceptsHelpers: acceptsHelpers(c),
     raisedUpdatedAt: c.raisedUpdatedAt,
     /** "monobank_jar" when read from the jar's public page, otherwise typed in by the organizer. */
     raisedSource: c.raisedSource === "jar" ? ("monobank_jar" as const) : c.raisedSource === "jar_public" ? ("monobank_public" as const) : ("organizer_reported" as const),
@@ -89,7 +102,7 @@ export function toCard(c: Campaign, org: User | null, extra: { hasFinalReport: b
     viewCount: c.viewCount,
     followers: extra.followers,
     verification: verificationOf(c, org, extra.hasFinalReport),
-    organizer: org ? { id: org.id, name: org.name, avatarUrl: fileUrl(org.avatarFileId), identityVerified: !!org.identityVerifiedAt, isDemo: org.isDemo } : null,
+    organizer: org ? { id: org.id, name: org.orgName || org.name, avatarUrl: fileUrl(org.avatarFileId), identityVerified: !!org.identityVerifiedAt, isOrganization: !!org.orgVerifiedAt, isDemo: org.isDemo } : null,
   };
 }
 

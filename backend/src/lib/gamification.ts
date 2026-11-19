@@ -2,8 +2,9 @@
  * Volunteerhub Impact — XP, levels, achievements, weekly missions and challenges.
  *
  * Principles:
- *  - XP rewards participation (following, sharing, referring visitors, communities),
- *    never the amount donated. Volunteerhub has no reliable donation data anyway.
+ *  - XP rewards participation (following, sharing, referring visitors, communities,
+ *    opening a helping jar), never the amount donated. Reaching a helping jar's own goal
+ *    is the one milestone that counts, once per jar.
  *  - Every award is keyed by (user, action, refKey) and stored with a unique index,
  *    so repeating an action can never be farmed.
  */
@@ -54,6 +55,8 @@ export const XP_RULES = {
   challenge_complete: { xp: 100, label: "Челендж виконано" },
   mission_complete: { xp: 30, label: "Тижнева місія" },
   campaign_published: { xp: 50, label: "Збір опубліковано" },
+  helper_created: { xp: 40, label: "Допоміжну банку відкрито" },
+  helper_goal: { xp: 150, label: "Ціль допоміжної банки досягнуто" },
   campaign_update: { xp: 10, label: "Оновлення для донорів", daily: 3 },
   final_report: { xp: 80, label: "Фінальний звіт" },
   profile_complete: { xp: 20, label: "Профіль заповнено" },
@@ -89,6 +92,8 @@ export const ACHIEVEMENTS = [
   { code: "community_builder", title: "Січовий побратим", en: "Sich Brother", description: "Учасник спільноти та її челенджу.", icon: "users", tier: "silver" },
   { code: "consistent_supporter", title: "Вірний побратим", en: "Loyal Comrade", description: "Активність протягом 4 різних тижнів.", icon: "calendar-check", tier: "gold" },
   { code: "impact_champion", title: "Лицар Запорозький", en: "Zaporozhian Knight", description: "Набрали 1000 Impact XP.", icon: "trophy", tier: "gold" },
+  { code: "helper_jar", title: "Свій скарбник", en: "Own Treasurer", description: "Відкрили допоміжну банку для перевіреного збору.", icon: "piggy-bank", tier: "bronze" },
+  { code: "helper_goal", title: "Фортецю взято", en: "Fortress Taken", description: "Ваша допоміжна банка досягла своєї цілі.", icon: "target", tier: "gold" },
   { code: "first_campaign", title: "Перший похід", en: "First Campaign", description: "Ваш збір пройшов модерацію та опублікований.", icon: "flag", tier: "bronze" },
   { code: "transparent", title: "Чесний писар", en: "Honest Scribe", description: "Опублікували фінальний звіт про витрати.", icon: "file-check", tier: "gold" },
 ] as const;
@@ -127,6 +132,14 @@ export async function evaluateProgress(db: DB, userId: string): Promise<{ newAch
   await check("consistent_supporter", async () => {
     const rows = await db.select({ t: xpEvents.createdAt }).from(xpEvents).where(eq(xpEvents.userId, userId));
     return new Set(rows.map((r) => isoWeekKey(r.t))).size >= 4;
+  });
+  await check("helper_jar", async () => {
+    const [r] = await db.select({ n: count() }).from(xpEvents).where(and(eq(xpEvents.userId, userId), eq(xpEvents.action, "helper_created")));
+    return r.n > 0;
+  });
+  await check("helper_goal", async () => {
+    const [r] = await db.select({ n: count() }).from(xpEvents).where(and(eq(xpEvents.userId, userId), eq(xpEvents.action, "helper_goal")));
+    return r.n > 0;
   });
   await check("first_campaign", async () => {
     const [r] = await db.select({ n: count() }).from(campaigns).where(and(eq(campaigns.organizerId, userId), isNotNull(campaigns.publishedAt)));

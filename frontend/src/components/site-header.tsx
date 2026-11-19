@@ -83,15 +83,15 @@ export function SiteHeader() {
               <ButtonLink href="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
                 Увійти
               </ButtonLink>
-              <ButtonLink href="/dashboard/campaigns/new" variant="primary" size="sm" className="hidden sm:inline-flex">
-                <Plus /> Створити збір
+              <ButtonLink href="/explore" variant="primary" size="sm" className="hidden sm:inline-flex">
+                <Plus /> Відкрити банку
               </ButtonLink>
             </>
           )}
           {user && (
             <>
-              <ButtonLink href="/dashboard/campaigns/new" variant="secondary" size="sm" className="hidden sm:inline-flex">
-                <Plus /> Створити збір
+              <ButtonLink href={user.isOrganization ? "/dashboard/campaigns/new" : "/explore"} variant="secondary" size="sm" className="hidden sm:inline-flex">
+                <Plus /> {user.isOrganization ? "Створити збір" : "Відкрити банку"}
               </ButtonLink>
               <div className="relative hidden sm:block">
                 <button onClick={() => setMenu((v) => !v)} className="flex items-center gap-2 rounded-full p-0.5 transition-shadow duration-300 hover:ring-4 hover:ring-fg/10" aria-label="Меню профілю" aria-haspopup="menu" aria-expanded={menu}>
@@ -144,9 +144,9 @@ export function SiteHeader() {
             {user ? (
               <>
                 <ButtonLink href="/dashboard" variant="secondary">Мій кабінет</ButtonLink>
-                <ButtonLink href="/dashboard/organizer" variant="secondary">Мої збори</ButtonLink>
+                {(user.isOrganization || user.role === "admin") && <ButtonLink href="/dashboard/organizer" variant="secondary">Мої збори</ButtonLink>}
                 {user.role === "admin" && <ButtonLink href="/admin" variant="secondary">Адмін-панель</ButtonLink>}
-                <ButtonLink href="/dashboard/campaigns/new" variant="primary"><Plus /> Створити збір</ButtonLink>
+                <ButtonLink href={user.isOrganization ? "/dashboard/campaigns/new" : "/explore"} variant="primary"><Plus /> {user.isOrganization ? "Створити збір" : "Відкрити банку"}</ButtonLink>
                 <button onClick={doLogout} className={buttonVariants({ variant: "ghost" })}>Вийти</button>
               </>
             ) : (
