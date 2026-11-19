@@ -91,9 +91,11 @@ export const campaigns = sqliteTable(
     city: text("city").notNull().default(""),
     coverFileId: text("cover_file_id"),
     goalAmount: integer("goal_amount").notNull().default(0),
-    /** Amount reported by the organizer. Never synced automatically (no official API). */
+    /** Amount raised. Synced from the Monobank jar when possible, otherwise reported by the organizer. */
     raisedAmount: integer("raised_amount").notNull().default(0),
     raisedUpdatedAt: integer("raised_updated_at"),
+    /** "organizer" (typed in by the organizer) | "jar" (read from the public Monobank jar page). */
+    raisedSource: text("raised_source").notNull().default("organizer"),
     deadline: integer("deadline"),
     urgent: integer("urgent", { mode: "boolean" }).notNull().default(false),
     jarUrl: text("jar_url"),
@@ -105,6 +107,10 @@ export const campaigns = sqliteTable(
     purposeReviewedAt: integer("purpose_reviewed_at"),
     /** Set by a moderator who opened the jar and matched it to the organizer. */
     destinationVerifiedAt: integer("destination_verified_at"),
+    /** Monobank connection whose webhook keeps this campaign's amount live (see lib/monobank-live.ts). */
+    monoConnectionId: text("mono_connection_id"),
+    /** Internal Monobank jar account id (not the public send id); webhook events are matched on it. */
+    monoJarAccount: text("mono_jar_account"),
     viewCount: integer("view_count").notNull().default(0),
     donateClicks: integer("donate_clicks").notNull().default(0),
     isDemo: integer("is_demo", { mode: "boolean" }).notNull().default(false),
@@ -119,6 +125,7 @@ export const campaigns = sqliteTable(
     uniqueIndex("campaigns_slug_uq").on(t.slug),
     index("campaigns_status_idx").on(t.status),
     index("campaigns_org_idx").on(t.organizerId),
+    index("campaigns_mono_jar_idx").on(t.monoJarAccount),
   ],
 );
 
@@ -336,5 +343,47 @@ export const appSettings = sqliteTable("app_settings", {
   value: text("value").notNull(),
 });
 
+/**
+ * An organizer's link to the official Monobank personal API (one per user, because Monobank
+ * allows one webhook per token). The token is stored encrypted with MONO_TOKEN_KEY and is
+ * only used to read jar balances and to register the webhook.
+ */
+export const monobankConnections = sqliteTable(
+  "monobank_connections",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    /** AES-GCM ciphertext of the personal token: base64(iv).base64(ciphertext). */
+    tokenEnc: text("token_enc").notNull(),
+    /** Random path segment of our webhook URL; identifies the connection. */
+    webhookSecret: text("webhook_secret").notNull(),
+    clientName: text("client_name").notNull().default(""),
+    webhookUrl: text("webhook_url"),
+    webhookActive: integer("webhook_active", { mode: "boolean" }).notNull().default(false),
+    lastSyncAt: integer("last_sync_at"),
+    lastEventAt: integer("last_event_at"),
+    lastError: text("last_error"),
+    createdAt: integer("created_at").notNull().default(now),
+    updatedAt: integer("updated_at").notNull().default(now),
+  },
+  (t) => [uniqueIndex("mono_conn_user_uq").on(t.userId), uniqueIndex("mono_conn_secret_uq").on(t.webhookSecret)],
+);
+
+/** Incoming jar payments already counted, keyed by Monobank's statement id (webhook retries are idempotent). */
+export const monobankEvents = sqliteTable(
+  "monobank_events",
+  {
+    id: text("id").primaryKey(),
+    connectionId: text("connection_id").notNull(),
+    account: text("account").notNull(),
+    /** Whole hryvnias. Positive top-ups only. */
+    amount: integer("amount").notNull(),
+    time: integer("time").notNull(),
+    createdAt: integer("created_at").notNull().default(now),
+  },
+  (t) => [index("mono_events_account_idx").on(t.account)],
+);
+
+export type MonobankConnection = typeof monobankConnections.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;

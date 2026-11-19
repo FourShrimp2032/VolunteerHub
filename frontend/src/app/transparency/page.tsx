@@ -35,7 +35,7 @@ export default function TransparencyPage() {
           <Info className="size-5 text-accent" />
           <p className="mt-3 font-semibold">Звідки суми зібраного</p>
           <p className="mt-2 text-sm leading-relaxed text-fg-muted">
-            Monobank не надає офіційного публічного API для балансу банки. Тому суми вводить організатор, і ми завжди позначаємо їх як «за даними організатора» з датою оновлення.
+            Організатор може підключити банку через офіційний API Monobank. Тоді сума оновлюється сама після кожного донату й позначена «Наживо з банки Monobank». Інакше суму вводить організатор, і ми позначаємо її як «за даними організатора» з датою оновлення.
           </p>
         </Card>
         <Card className="p-6">

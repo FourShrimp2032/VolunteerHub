@@ -254,7 +254,14 @@ function DonatePanel({ data, reload }: { data: Resp; reload: () => void }) {
       <p className="mt-2.5 flex items-start gap-1.5 text-xs leading-relaxed text-fg-subtle">
         <Info className="mt-px size-3.5 shrink-0" />
         <span>
-          Сума за даними організатора{c.raisedUpdatedAt ? `, оновлено ${timeAgo(c.raisedUpdatedAt)}` : ""}. Volunteerhub не має доступу до балансу банки.
+          {c.raisedSource === "monobank_jar" ? (
+            <>
+              <span className="mr-1.5 inline-flex translate-y-[-1px] items-center gap-1.5 align-middle text-fg-muted"><span className="pulse !size-1.5" aria-hidden />Наживо з банки Monobank</span>
+              {c.raisedUpdatedAt ? `оновлено ${timeAgo(c.raisedUpdatedAt)}` : ""}. Сума оновлюється автоматично після кожного донату.
+            </>
+          ) : (
+            <>Сума за даними організатора{c.raisedUpdatedAt ? `, оновлено ${timeAgo(c.raisedUpdatedAt)}` : ""}.</>
+          )}
         </span>
       </p>
       <div className="mt-4 grid grid-cols-3 gap-2 text-center">

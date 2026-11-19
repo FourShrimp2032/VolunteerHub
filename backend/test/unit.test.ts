@@ -3,6 +3,7 @@ import { OAuth2Client } from "google-auth-library";
 import { buildSections, scoreCampaign } from "../src/lib/discovery";
 import { levelForXp } from "../src/lib/gamification";
 import { parseJarUrl } from "../src/lib/monobank";
+import { decryptToken, encryptToken, parseClientInfo, parseWebhookEvent, sendIdToJarId } from "../src/lib/monobank-live";
 import { sniffMime } from "../src/lib/storage";
 import { slugify } from "../src/lib/util";
 
@@ -24,6 +25,38 @@ describe("parseJarUrl", () => {
       "https://send.monobank.ua/jar/<script>",
     ])
       expect(parseJarUrl(bad).ok).toBe(false);
+  });
+});
+
+describe("monobank personal API", () => {
+  it("maps jar send ids to the id in send.monobank.ua/jar/<id> links", () => {
+    expect(sendIdToJarId("jar/z6PK8H4hU")).toBe("z6PK8H4hU");
+    expect(sendIdToJarId("z6PK8H4hU")).toBe("z6PK8H4hU");
+  });
+  it("reads jars from client-info (kopecks → hryvnias) and skips malformed ones", () => {
+    const info = parseClientInfo({
+      name: "Устим Т.",
+      webHookUrl: "",
+      jars: [
+        { id: "kKGVoZuHWzqVoZuH", sendId: "jar/z6PK8H4hU", title: "Чортики", currencyCode: 980, balance: 1001, goal: 1000000 },
+        { id: "broken", title: "no send id" },
+      ],
+    });
+    expect(info).toEqual({ name: "Устим Т.", webHookUrl: "", jars: [{ id: "kKGVoZuHWzqVoZuH", jarId: "z6PK8H4hU", title: "Чортики", balance: 10 }] });
+    expect(parseClientInfo(null)).toBeNull();
+  });
+  it("parses StatementItem webhook events", () => {
+    const ev = parseWebhookEvent({ type: "StatementItem", data: { account: "kKGVoZuHWzqVoZuH", statementItem: { id: "ZuHWzqkKGVo=", time: 1554466347, amount: 5000, balance: 6001, description: "Поповнення" } } });
+    expect(ev).toEqual({ account: "kKGVoZuHWzqVoZuH", id: "ZuHWzqkKGVo=", amount: 50, balance: 60, time: 1554466347000 });
+    expect(parseWebhookEvent({ type: "Other" })).toBeNull();
+    expect(parseWebhookEvent({ type: "StatementItem", data: { account: "x", statementItem: { id: "1", amount: "50" } } })).toBeNull();
+  });
+  it("encrypts tokens at rest and refuses production without a key", async () => {
+    const env = { DB: undefined as never, MONO_TOKEN_KEY: btoa("k".repeat(32)) };
+    const enc = await encryptToken(env, "uXyz-secret-token-1234567890");
+    expect(enc).not.toContain("secret");
+    expect(await decryptToken(env, enc)).toBe("uXyz-secret-token-1234567890");
+    await expect(encryptToken({ DB: undefined as never, ENVIRONMENT: "production" }, "t")).rejects.toThrow();
   });
 });
 

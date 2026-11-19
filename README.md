@@ -32,7 +32,7 @@ A modern web app (UI in Ukrainian) where:
 - **Auth:** email + password registration, login and logout. Server-side sessions in an HttpOnly cookie, profile management, password change, protected dashboard routes, and roles (user/admin).
 - **Campaign wizard (5 steps):** about → goal and budget → Monobank Jar → documents → preview and submit. Drafts are saved on every step.
 - **Campaign lifecycle:** `draft → pending → active → goal_reached → completed`, plus `rejected`.
-- **Monobank Jar:** strict URL validation (host must be `send.monobank.ua`, path `/jar/<id>`), normalized storage and a safe server-side redirect. Raised amounts are **organizer-reported and labelled as such**, because Monobank has no official public jar-balance API.
+- **Monobank Jar:** strict URL validation (host must be `send.monobank.ua`, path `/jar/<id>`), normalized storage and a safe server-side redirect. Organizers can connect the jar through the **official Monobank personal API** (their own read-only token from api.monobank.ua): we register a webhook, count each incoming payment once, and label the amount "Наживо з банки Monobank". A cron poll is the fallback if the webhook stops. Unconnected campaigns show **organizer-reported** amounts, labelled as such.
 - **Organizer dashboard:** my campaigns, stats (unique views per day, followers, shares, referred visitors, clicks to the jar), progress updates, updates/purchases/final reports with receipts, attachments.
 - **Supporter dashboard:** followed and saved campaigns, recent updates, personal impact stats, level, XP history, weekly missions, achievements, communities and challenges.
 - **Trust:** identity verification via a **private** document upload (owner and admins only), purpose review on approval, jar verification by a moderator, and a "report submitted" badge. Content reports.
@@ -105,6 +105,7 @@ All variables are documented in [`infra/.env.example`](infra/.env.example).
 | `ALLOWED_ORIGINS` | backend | dev only | Extra origins allowed to send POST/PATCH (the Next dev server, `http://localhost:3000`) |
 | `VISITOR_SALT` | backend secret | recommended | Random string used to hash IP + user agent for unique-view counting. No raw IPs are stored |
 | `ADMIN_EMAILS` | backend secret | optional | Comma-separated emails that get the admin role when they register |
+| `MONO_TOKEN_KEY` | backend secret | production | base64 of 32 random bytes (`openssl rand -base64 32`). Encrypts organizers' Monobank personal tokens for live jar totals. Changing it means organizers must reconnect |
 | `PLATFORM_SUPPORT_JAR_URL` | backend var | optional | A **separate** Monobank jar for supporting the platform itself |
 | `API_URL` | frontend (dev) | no | Where `next dev` proxies `/api` (default `http://localhost:8787`) |
 | `CLOUDFLARE_API_TOKEN` | deploy | for deploy | Token with *Workers Scripts: Edit* and *D1: Edit* |
@@ -172,7 +173,7 @@ Production is **one Cloudflare Worker** (`infra/cloudflare/wrangler.toml`) that 
 
 - `CLOUDFLARE_API_TOKEN`: create it in Cloudflare → *My Profile → API Tokens* from the **Edit Cloudflare Workers** template, and add **Account → D1 → Edit**
 - `CLOUDFLARE_ACCOUNT_ID`
-- optional: `VISITOR_SALT`, `ADMIN_EMAILS`
+- optional: `VISITOR_SALT`, `ADMIN_EMAILS`, `MONO_TOKEN_KEY`
 
 **Manual:**
 
@@ -197,7 +198,7 @@ bash infra/scripts/deploy.sh
 
 | Feature | Status |
 |---|---|
-| Automatic Monobank balance sync | Not possible through an official, approved API. Organizers update amounts manually, and they're labelled "за даними організатора". |
+| Automatic Monobank balance sync | Works per organizer through their personal API token and webhook. Monobank recommends its corporate (provider) API for services that process client data on their own servers; moving to it needs an agreement with Monobank. |
 | Subscription billing (Pro/Corporate) | Plan structure and pricing page only. |
 | Platform support jar | Shown on `/support` once `PLATFORM_SUPPORT_JAR_URL` is set. Until then the page says it isn't connected. |
 | Email notifications | "Updates" are shown in the supporter dashboard. No emails are sent yet. |
