@@ -72,7 +72,7 @@ export default function CommunityPage() {
                 <Badge tone="outline">{K.label}</Badge>
                 {d.community.isDemo && <Badge tone="dark">Демо</Badge>}
               </div>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{d.community.name}</h1>
+              <h1 className="mt-3 animate-[fade-up_0.9s_var(--ease)_both] text-[clamp(32px,4.4vw,60px)] font-medium leading-[1] tracking-[-0.045em]">{d.community.name}</h1>
               <p className="text-sm text-fg-muted">{d.community.members} {plural(d.community.members, "учасник", "учасники", "учасників")}</p>
             </div>
           </div>

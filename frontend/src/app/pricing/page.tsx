@@ -2,6 +2,7 @@ import { cn } from "@/lib/cn";
 import { Check, Minus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Badge, ButtonLink, Card } from "@/components/ui/primitives";
+import { RiseWords } from "@/components/motion";
 
 export const metadata = { title: "Тарифи" };
 
@@ -39,7 +40,7 @@ export default function PricingPage() {
     <div className="container-page pt-12 sm:pt-16">
       <div className="mx-auto max-w-2xl text-center">
         <Badge tone="accent">Ми не беремо відсоток із донатів</Badge>
-        <h1 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-tight sm:text-[46px]">Безкоштовно для волонтерів. Pro для організацій.</h1>
+        <RiseWords as="h1" text="Безкоштовно для волонтерів. Pro для організацій." className="mt-5 text-balance text-[clamp(40px,6.2vw,92px)] font-medium leading-[0.98] tracking-[-0.05em]" />
         <p className="mt-4 text-lg text-fg-muted">Volunteerhub заробляє на програмних інструментах для організацій, а не на ваших донатах.</p>
       </div>
 

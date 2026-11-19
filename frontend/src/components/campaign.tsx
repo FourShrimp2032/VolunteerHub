@@ -4,6 +4,7 @@ import { BadgeCheck, Clock, Eye, FileCheck2, Flame, Landmark, ScanSearch, Shield
 import Link from "next/link";
 import type * as React from "react";
 import { Avatar } from "@/components/avatar";
+import { RiseWords } from "@/components/motion";
 import { Badge, Progress, Skeleton } from "@/components/ui/primitives";
 import { categoryOf, STATUS_LABELS } from "@/lib/categories";
 import { cn } from "@/lib/cn";
@@ -24,7 +25,7 @@ export function CampaignCover({ campaign, className, iconSize = 34 }: { campaign
     <div
       className={cn("relative h-full w-full overflow-hidden", className)}
       style={{
-        background: `radial-gradient(120% 100% at ${15 + (seed % 60)}% 0%, oklch(0.985 0.012 ${h}) 0%, transparent 65%), linear-gradient(160deg, oklch(0.955 0.025 ${h}), oklch(0.925 0.04 ${h}))`,
+        background: `radial-gradient(120% 100% at ${15 + (seed % 60)}% 0%, oklch(0.97 0.012 ${h}) 0%, transparent 65%), linear-gradient(160deg, oklch(0.935 0.018 ${h}), oklch(0.9 0.028 ${h}))`,
       }}
       aria-hidden
     >
@@ -35,7 +36,7 @@ export function CampaignCover({ campaign, className, iconSize = 34 }: { campaign
         style={{ width: big, height: big, right: -big * 0.12, bottom: -big * 0.24, color: `oklch(0.5 0.09 ${h})`, opacity: 0.22, transform: `rotate(${(seed % 20) - 10}deg)` }}
       />
       <span
-        className="absolute bottom-3 left-3 grid place-items-center rounded-lg bg-white p-2 shadow-[0_1px_2px_oklch(0.2_0.02_260/0.08),0_0_0_1px_oklch(0.2_0.02_260/0.06)]"
+        className="absolute bottom-3.5 left-3.5 grid place-items-center rounded-full bg-surface p-2.5"
         style={{ color: `oklch(0.45 0.12 ${h})` }}
       >
         <Icon style={{ width: iconSize * 0.58, height: iconSize * 0.58 }} strokeWidth={1.8} />
@@ -91,32 +92,28 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
   const status = STATUS_LABELS[c.status];
   const checked = c.verification.purposeReviewed || c.verification.destinationVerified;
   return (
-    <Link
-      href={`/campaigns/${c.slug}`}
-      className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lift",
-        className,
-      )}
-    >
-      <div className="relative aspect-[16/9] overflow-hidden border-b border-border bg-muted">
-        <CampaignCover campaign={c} className="transition duration-500 ease-out group-hover:scale-[1.025]" />
-        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+    <Link href={`/campaigns/${c.slug}`} className={cn("group flex flex-col", className)}>
+      <div data-tilt data-cursor="Відкрити" className="tilt relative aspect-[4/3] overflow-hidden bg-muted">
+        <div className="absolute inset-0 transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]">
+          <CampaignCover campaign={c} />
+        </div>
+        <div className="absolute left-3.5 top-3.5 flex flex-wrap gap-1.5">
           {c.urgent && c.status === "active" && (
-            <Badge tone="danger" className="border-transparent bg-danger text-white shadow-sm">
+            <Badge tone="danger" className="border-transparent bg-signal text-white">
               <Flame /> Терміново
             </Badge>
           )}
           {c.status !== "active" && status && <Badge tone={status.tone}>{status.label}</Badge>}
         </div>
         {c.isDemo && (
-          <Badge tone="outline" className="absolute right-3 top-3 border-border bg-white/90 text-fg-muted backdrop-blur">
+          <Badge tone="outline" className="mono absolute right-3.5 top-3.5 border-transparent bg-surface/90 text-[11px] text-fg-muted backdrop-blur">
             Демо
           </Badge>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <p className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-medium text-fg-subtle">
-          <span className="inline-flex items-center gap-1" style={{ color: `oklch(0.45 0.11 ${cat.hue})` }}>
+      <div className="flex flex-1 flex-col pt-5">
+        <p className="mono mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] uppercase tracking-[0.06em] text-fg-subtle">
+          <span className="inline-flex items-center gap-1.5 text-fg-muted">
             <cat.icon className="size-3.5" /> {cat.short}
           </span>
           {checked && (
@@ -124,19 +121,21 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
               <ShieldCheck className="size-3.5" /> Перевірено
             </span>
           )}
-          {c.reasons && c.reasons.length > 0 && <span className="text-accent">{c.reasons[0]}</span>}
+          {c.reasons && c.reasons.length > 0 && <span className="normal-case tracking-normal text-accent">{c.reasons[0]}</span>}
         </p>
-        <h3 className="line-clamp-2 text-[16px] font-bold leading-snug text-fg transition-colors group-hover:text-accent">{c.title}</h3>
-        <p className="mt-1.5 line-clamp-2 text-[13.5px] leading-relaxed text-fg-muted">{c.summary}</p>
+        <h3 className="line-clamp-2 text-[19px] font-medium leading-[1.2] tracking-[-0.025em] text-fg">
+          <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:bg-[length:100%_1px]">{c.title}</span>
+        </h3>
+        <p className="mt-2 line-clamp-2 text-[14px] leading-relaxed text-fg-muted">{c.summary}</p>
         <div className="mt-auto pt-5">
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <span className="font-heading text-[17px] font-bold tabular-nums tracking-[-0.02em]">
+          <div className="mb-2.5 flex items-baseline justify-between gap-2">
+            <span className="text-[17px] font-medium tabular-nums tracking-[-0.02em]">
               {money(c.raisedAmount)}
-              <span className="ml-1.5 text-[12px] font-normal text-fg-subtle">з {money(c.goalAmount)}</span>
+              <span className="mono ml-1.5 text-[11.5px] font-normal text-fg-subtle">/ {money(c.goalAmount)}</span>
             </span>
-            <span className={cn("text-[13px] font-semibold tabular-nums", c.progress >= 1 ? "text-success" : "text-accent")}>{pct(c.progress)}</span>
+            <span className={cn("mono text-[12.5px] tabular-nums", c.progress >= 1 ? "text-success" : "text-accent")}>{pct(c.progress)}</span>
           </div>
-          <Progress value={c.progress} tone={c.progress >= 1 ? "success" : "accent"} label={`Зібрано ${pct(c.progress)}`} />
+          <Progress value={c.progress} tone={c.progress >= 1 ? "success" : "accent"} size="sm" label={`Зібрано ${pct(c.progress)}`} />
         </div>
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3.5 text-[12px] text-fg-subtle">
           {c.organizer ? (
@@ -148,9 +147,9 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
           ) : (
             <span />
           )}
-          <span className="flex shrink-0 items-center gap-2.5">
+          <span className="mono flex shrink-0 items-center gap-3 text-[11.5px]">
             {left !== null && left >= 0 && c.status === "active" && (
-              <span className={cn("inline-flex items-center gap-1", left <= 3 && "font-medium text-danger")}>
+              <span className={cn("inline-flex items-center gap-1", left <= 3 && "text-danger")}>
                 <Clock className="size-3.5" /> {left} {plural(left, "день", "дні", "днів")}
               </span>
             )}
@@ -166,9 +165,9 @@ export function CampaignCard({ c, className }: { c: Card; className?: string }) 
 
 export function CampaignCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
-      <Skeleton className="aspect-[16/9] rounded-none" />
-      <div className="space-y-3 p-5">
+    <div>
+      <Skeleton className="aspect-[4/3] rounded-[14px]" />
+      <div className="space-y-3 pt-5">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-2/3" />
@@ -182,7 +181,7 @@ export function CampaignGrid({ items, loading, empty, cols = 3 }: { items?: Card
   const grid = cols === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-2 lg:grid-cols-3";
   if (loading || !items)
     return (
-      <div className={cn("grid gap-5", grid)}>
+      <div className={cn("grid gap-x-6 gap-y-12", grid)}>
         {Array.from({ length: cols === 4 ? 4 : 3 }).map((_, i) => (
           <CampaignCardSkeleton key={i} />
         ))}
@@ -190,9 +189,9 @@ export function CampaignGrid({ items, loading, empty, cols = 3 }: { items?: Card
     );
   if (!items.length) return <>{empty}</>;
   return (
-    <div className={cn("grid gap-5", grid)}>
+    <div className={cn("grid gap-x-6 gap-y-14", grid)}>
       {items.map((c, i) => (
-        <div key={c.id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
+        <div key={c.id} className="reveal" style={{ ["--d" as string]: `${(i % (cols === 4 ? 4 : 3)) * 90}ms` }}>
           <CampaignCard c={c} className="h-full" />
         </div>
       ))}
@@ -204,41 +203,52 @@ export function CampaignGrid({ items, loading, empty, cols = 3 }: { items?: Card
 export function CampaignRow({ items, loading }: { items?: Card[] | null; loading?: boolean }) {
   if (loading || !items)
     return (
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <CampaignCardSkeleton key={i} />
         ))}
       </div>
     );
   return (
-    <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-      {items.slice(0, 4).map((c) => (
-        <CampaignCard key={c.id} c={c} className="w-[84%] shrink-0 snap-start sm:w-auto" />
+    <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+      {items.slice(0, 4).map((c, i) => (
+        <div key={c.id} className="w-[82%] shrink-0 snap-start animate-[fade-up_0.8s_var(--ease)_both] sm:w-auto" style={{ animationDelay: `${i * 70}ms` }}>
+          <CampaignCard c={c} className="h-full" />
+        </div>
       ))}
     </div>
   );
 }
 
-export function SectionHeader({ eyebrow, title, description, action }: { eyebrow?: React.ReactNode; title: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }) {
+/** Editorial section head: rising-word title, mono index on the right, a hairline that draws itself. */
+export function SectionHeader({ eyebrow, title, description, action, index }: { eyebrow?: React.ReactNode; title: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode; index?: string }) {
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div className="max-w-2xl">
-        {eyebrow && (
-          <p className="mb-2.5 text-[13px] font-semibold text-accent">{eyebrow}</p>
-        )}
-        <h2 className="text-balance text-[26px] leading-[1.15] sm:text-[32px]">{title}</h2>
-        {description && <p className="mt-3 text-[15.5px] leading-relaxed text-fg-muted">{description}</p>}
+    <div className="mb-10 sm:mb-14">
+      <div className="flex flex-col gap-5 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="max-w-3xl">
+          {eyebrow && <p className="reveal mono mb-4 text-[12px] uppercase tracking-[0.08em] text-fg-subtle">{eyebrow}</p>}
+          {typeof title === "string" ? (
+            <RiseWords text={title} className="text-balance text-[clamp(30px,4.4vw,56px)] leading-[1.02] tracking-[-0.04em]" />
+          ) : (
+            <h2 className="reveal text-balance text-[clamp(30px,4.4vw,56px)] leading-[1.02] tracking-[-0.04em]">{title}</h2>
+          )}
+          {description && <p className="reveal mt-5 max-w-xl text-[16px] leading-relaxed text-fg-muted" style={{ ["--d" as string]: "150ms" }}>{description}</p>}
+        </div>
+        <div className="reveal flex shrink-0 items-center gap-5" style={{ ["--d" as string]: "200ms" }}>
+          {action}
+          {index && <span className="mono hidden text-[13px] text-fg-subtle sm:inline">({index})</span>}
+        </div>
       </div>
-      {action}
+      <div className="reveal-line h-px bg-border" />
     </div>
   );
 }
 
 export function EmptyState({ icon, title, description, action }: { icon?: React.ReactNode; title: string; description?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-dashed border-border-strong bg-surface px-6 py-14 text-center">
-      {icon && <div className="mb-4 grid size-11 place-items-center rounded-xl border border-border bg-subtle text-fg-muted [&_svg]:size-5">{icon}</div>}
-      <p className="font-heading text-[16px] font-bold">{title}</p>
+    <div className="flex animate-[fade-up_0.8s_var(--ease)_both] flex-col items-center rounded-3xl border border-dashed border-border-strong px-6 py-16 text-center">
+      {icon && <div className="mb-5 grid size-12 place-items-center rounded-full border border-border bg-surface text-fg-muted [&_svg]:size-5">{icon}</div>}
+      <p className="text-[20px] font-medium tracking-[-0.03em]">{title}</p>
       {description && <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-fg-muted">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>

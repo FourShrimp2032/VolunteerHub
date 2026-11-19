@@ -5,6 +5,7 @@ import * as React from "react";
 import { Alert, Card, Skeleton, buttonVariants } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
+import { RiseWords } from "@/components/motion";
 
 export default function SupportPage() {
   const [url, setUrl] = React.useState<string | null | undefined>(undefined);
@@ -14,7 +15,7 @@ export default function SupportPage() {
   return (
     <div className="container-page max-w-3xl pt-12 sm:pt-16">
       <span className="grid size-12 place-items-center rounded-2xl bg-danger-soft text-danger"><Heart className="size-6" /></span>
-      <h1 className="mt-6 text-4xl font-bold tracking-tight">Підтримати Volunteerhub</h1>
+      <RiseWords as="h1" text="Підтримати Volunteerhub" className="mt-6 text-balance text-[clamp(40px,6.2vw,92px)] font-medium leading-[0.98] tracking-[-0.05em]" />
       <p className="mt-4 text-lg leading-relaxed text-fg-muted">
         Volunteerhub безкоштовний для донорів і волонтерів, і ми не беремо комісії зі зборів. Якщо хочете допомогти розвитку та підтримці платформи, це можна зробити добровільно.
       </p>

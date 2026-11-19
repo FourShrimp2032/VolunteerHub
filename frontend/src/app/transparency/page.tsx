@@ -1,5 +1,6 @@
 import { BadgeCheck, Ban, Eye, FileCheck2, Info, Landmark, Lock, ScanSearch, Scale } from "lucide-react";
 import { ButtonLink, Card } from "@/components/ui/primitives";
+import { RiseWords } from "@/components/motion";
 
 export const metadata = { title: "Прозорість і перевірки" };
 
@@ -15,7 +16,7 @@ export default function TransparencyPage() {
     <div className="container-page pt-12 sm:pt-16">
       <div className="max-w-3xl">
         <p className="text-[13px] font-medium text-accent">Довіра та прозорість</p>
-        <h1 className="mt-2 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Як Volunteerhub перевіряє збори</h1>
+        <RiseWords as="h1" text="Як Volunteerhub перевіряє збори" className="mt-4 text-balance text-[clamp(40px,6.2vw,92px)] font-medium leading-[0.98] tracking-[-0.05em]" />
         <p className="mt-4 text-lg leading-relaxed text-fg-muted">Ми показуємо лише ті позначки, за якими справді стоїть перевірка. Якщо чогось не перевіряли, ви побачите це на сторінці збору.</p>
       </div>
 

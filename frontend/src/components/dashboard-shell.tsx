@@ -44,7 +44,7 @@ export function DashboardShell({ title, description, actions, children, admin }:
       </div>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-[26px] font-extrabold tracking-[-0.035em] sm:text-[32px]">{title}</h1>
+          <h1 className="animate-[fade-up_0.9s_var(--ease)_both] text-[clamp(30px,3.6vw,48px)] font-medium leading-[1.02] tracking-[-0.045em]">{title}</h1>
           {description && <p className="mt-1.5 text-fg-muted">{description}</p>}
         </div>
         {actions}

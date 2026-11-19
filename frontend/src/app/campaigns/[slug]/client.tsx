@@ -102,7 +102,7 @@ export default function CampaignPage() {
             {c.city && <Badge tone="outline"><MapPin /> {c.city}</Badge>}
             {c.isDemo && <Badge tone="dark">Демо</Badge>}
           </div>
-          <h1 className="mt-4 text-balance text-[28px] font-bold leading-tight tracking-tight sm:text-4xl">{c.title}</h1>
+          <h1 className="mt-5 animate-[fade-up_0.9s_var(--ease)_both] text-balance text-[clamp(32px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.045em]">{c.title}</h1>
           {c.summary && <p className="mt-3 text-[17px] leading-relaxed text-fg-muted">{c.summary}</p>}
           <div className="mt-4"><VerificationBadges v={c.verification} /></div>
 

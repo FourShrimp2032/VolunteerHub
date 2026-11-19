@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { MotionRoot } from "@/components/motion";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { AuthProvider } from "@/lib/auth";
@@ -12,14 +13,19 @@ export const metadata: Metadata = {
   icons: { icon: "/icon.svg" },
 };
 
-export const viewport: Viewport = { themeColor: "#0B1A12", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#f4f3ef", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="uk">
+    <html lang="uk" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head>
+        {/* Enables scroll-reveal styles only when JS runs, so content never stays hidden without it. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="min-h-dvh">
         <AuthProvider>
           <ToastProvider>
+            <MotionRoot />
             <div className="flex min-h-dvh flex-col">
               <SiteHeader />
               <main className="flex-1">{children}</main>

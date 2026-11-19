@@ -1,5 +1,6 @@
 import { BarChart3, Building2, Lock, Mail, Medal, ShieldCheck, Trophy, Users } from "lucide-react";
 import { Badge, ButtonLink, Card } from "@/components/ui/primitives";
+import { RiseWords } from "@/components/motion";
 
 export const metadata = { title: "Corporate Volunteerhub" };
 
@@ -17,10 +18,10 @@ export default function BusinessPage() {
     <div>
       <section className="relative overflow-hidden border-b border-border">
         <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(60%_80%_at_70%_0%,black,transparent)]" aria-hidden />
-        <div className="pointer-events-none absolute right-[-120px] top-[-200px] h-[420px] w-[720px] rounded-full bg-[radial-gradient(closest-side,oklch(0.53_0.2_262/0.14),transparent)]" aria-hidden />
+        <div className="pointer-events-none absolute right-[-120px] top-[-200px] h-[420px] w-[720px] rounded-full bg-[radial-gradient(closest-side,rgb(255_77_28/0.10),transparent)]" aria-hidden />
         <div className="container-page relative py-20 sm:py-28">
           <Badge tone="accent">Corporate Volunteerhub · ранній доступ</Badge>
-          <h1 className="mt-6 max-w-3xl text-balance text-[38px] font-extrabold leading-[1.05] tracking-[-0.045em] sm:text-[60px]">Волонтерство вашої команди, яке видно.</h1>
+          <RiseWords as="h1" text="Волонтерство вашої команди, яке видно." className="mt-6 max-w-4xl text-balance text-[clamp(40px,6.2vw,92px)] font-medium leading-[0.98] tracking-[-0.05em]" />
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-fg-muted">
             Організуйте ініціативи працівників, челенджі та командну підтримку зборів в одному просторі. Компанії платять за програмне забезпечення, а не за контроль над донатами.
           </p>
