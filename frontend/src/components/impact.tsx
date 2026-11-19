@@ -8,8 +8,8 @@ import { cn } from "@/lib/cn";
 import { date, num, plural } from "@/lib/format";
 import type { Achievement, Challenge, Level, Mission } from "@/lib/types";
 
-const LEVEL_NAMES = ["Дослідник", "Прихильник", "Амбасадор змін", "Будівничий спільноти", "Лідер впливу"];
-const LEVEL_EN = ["Explorer", "Supporter", "Advocate", "Community Builder", "Impact Leader"];
+const LEVEL_NAMES = ["Козак", "Характерник", "Бугайло", "Отаман", "Гетьман"];
+const LEVEL_EN = ["Cossack", "Kharakternyk", "Buhailo", "Otaman", "Hetman"];
 
 export function LevelRing({ level, size = 112 }: { level: Level; size?: number }) {
   const r = size / 2 - 7;

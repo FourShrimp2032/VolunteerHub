@@ -109,7 +109,7 @@ export default function CommunityPage() {
         </div>
         <aside>
           <Card className="p-5 lg:sticky lg:top-24">
-            <p className="font-semibold">Рейтинг учасників</p>
+            <p className="font-semibold">Козацький реєстр</p>
             <p className="mb-4 mt-1 text-xs text-fg-subtle">Impact XP за поточний місяць. Лише участь, не суми донатів.</p>
             <Leaderboard rows={d.leaderboard.map((r) => ({ id: r.userId, name: r.name, xp: r.xp }))} highlightId={user?.id} />
           </Card>

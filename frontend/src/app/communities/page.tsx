@@ -101,7 +101,7 @@ export default function CommunitiesPage() {
         </section>
         <aside>
           <Card className="p-5 lg:sticky lg:top-24">
-            <p className="flex items-center gap-2 font-semibold"><Trophy className="size-4.5 text-gold" /> Рейтинг спільнот</p>
+            <p className="flex items-center gap-2 font-semibold"><Trophy className="size-4.5 text-gold" /> Реєстр спільнот</p>
             <p className="mb-4 mt-1 text-xs text-fg-subtle">Impact XP учасників за поточний місяць: підписки, поширення, нові відвідувачі, челенджі. Сума донатів не враховується.</p>
             <Leaderboard rows={(d?.leaderboard ?? []).map((r) => ({ id: r.id, name: r.name, xp: r.monthXp, sub: `${r.members} ${plural(r.members, "учасник", "учасники", "учасників")}`, href: `/communities/${r.slug}` }))} />
           </Card>

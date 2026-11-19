@@ -26,11 +26,11 @@ import { DAY } from "./constants";
 import { isoWeekKey, newId, startOfIsoWeek } from "./util";
 
 export const LEVELS = [
-  { level: 1, key: "explorer", name: "Explorer", nameUk: "Дослідник", minXp: 0 },
-  { level: 2, key: "supporter", name: "Supporter", nameUk: "Прихильник", minXp: 100 },
-  { level: 3, key: "advocate", name: "Advocate", nameUk: "Амбасадор змін", minXp: 300 },
-  { level: 4, key: "community_builder", name: "Community Builder", nameUk: "Будівничий спільноти", minXp: 700 },
-  { level: 5, key: "impact_leader", name: "Impact Leader", nameUk: "Лідер впливу", minXp: 1500 },
+  { level: 1, key: "explorer", name: "Cossack", nameUk: "Козак", minXp: 0 },
+  { level: 2, key: "supporter", name: "Kharakternyk", nameUk: "Характерник", minXp: 100 },
+  { level: 3, key: "advocate", name: "Buhailo", nameUk: "Бугайло", minXp: 300 },
+  { level: 4, key: "community_builder", name: "Otaman", nameUk: "Отаман", minXp: 700 },
+  { level: 5, key: "impact_leader", name: "Hetman", nameUk: "Гетьман", minXp: 1500 },
 ] as const;
 
 export function levelForXp(xp: number) {
@@ -83,14 +83,14 @@ export async function awardXp(db: DB, userId: string, action: XpAction, refKey: 
 // ---------------------------------------------------------------- achievements
 
 export const ACHIEVEMENTS = [
-  { code: "first_impact", title: "Перший внесок", en: "First Impact", description: "Перша підписка або поширення збору.", icon: "sparkles", tier: "bronze" },
-  { code: "early_supporter", title: "Ранній прихильник", en: "Early Supporter", description: "Підтримали збір у перші 72 години після публікації.", icon: "sunrise", tier: "bronze" },
-  { code: "ambassador", title: "Амбасадор", en: "Ambassador", description: "3 поширені збори привели нових відвідувачів.", icon: "megaphone", tier: "silver" },
-  { code: "community_builder", title: "Будівничий спільноти", en: "Community Builder", description: "Учасник спільноти та її челенджу.", icon: "users", tier: "silver" },
-  { code: "consistent_supporter", title: "Постійна підтримка", en: "Consistent Supporter", description: "Активність протягом 4 різних тижнів.", icon: "calendar-check", tier: "gold" },
-  { code: "impact_champion", title: "Чемпіон впливу", en: "Impact Champion", description: "Набрали 1000 Impact XP.", icon: "trophy", tier: "gold" },
-  { code: "first_campaign", title: "Перший збір", en: "First Campaign", description: "Ваш збір пройшов модерацію та опублікований.", icon: "flag", tier: "bronze" },
-  { code: "transparent", title: "Прозорість", en: "Transparent Organizer", description: "Опублікували фінальний звіт про витрати.", icon: "file-check", tier: "gold" },
+  { code: "first_impact", title: "Перша шабля", en: "First Sabre", description: "Перша підписка або поширення збору.", icon: "sparkles", tier: "bronze" },
+  { code: "early_supporter", title: "Перший на коні", en: "First in the Saddle", description: "Підтримали збір у перші 72 години після публікації.", icon: "sunrise", tier: "bronze" },
+  { code: "ambassador", title: "Кобзар", en: "Kobzar", description: "3 поширені збори привели нових відвідувачів.", icon: "megaphone", tier: "silver" },
+  { code: "community_builder", title: "Січовий побратим", en: "Sich Brother", description: "Учасник спільноти та її челенджу.", icon: "users", tier: "silver" },
+  { code: "consistent_supporter", title: "Вірний побратим", en: "Loyal Comrade", description: "Активність протягом 4 різних тижнів.", icon: "calendar-check", tier: "gold" },
+  { code: "impact_champion", title: "Лицар Запорозький", en: "Zaporozhian Knight", description: "Набрали 1000 Impact XP.", icon: "trophy", tier: "gold" },
+  { code: "first_campaign", title: "Перший похід", en: "First Campaign", description: "Ваш збір пройшов модерацію та опублікований.", icon: "flag", tier: "bronze" },
+  { code: "transparent", title: "Чесний писар", en: "Honest Scribe", description: "Опублікували фінальний звіт про витрати.", icon: "file-check", tier: "gold" },
 ] as const;
 
 async function grant(db: DB, userId: string, code: string): Promise<boolean> {
