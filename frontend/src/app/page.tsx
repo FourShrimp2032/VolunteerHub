@@ -332,7 +332,7 @@ function Impact({ stats }: { stats?: Home["stats"] }) {
     { v: stats?.finalReports, l: "фінальних звітів" },
     { v: stats?.members, l: "учасників спільноти" },
   ];
-  const levels = ["Дослідник", "Прихильник", "Амбасадор", "Будівничий", "Лідер"];
+  const levels = ["Козак", "Характерник", "Бугайло", "Отаман", "Гетьман"];
   return (
     <section className="container-page pt-[clamp(100px,14vw,200px)]">
       <SectionHeader
@@ -355,7 +355,7 @@ function Impact({ stats }: { stats?: Home["stats"] }) {
 
       <div className="mt-16 grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-end">
         <div className="reveal">
-          <p className="mono flex items-center gap-2 text-[12px] uppercase tracking-[0.08em] text-fg-subtle"><Trophy className="size-4 text-gold" aria-hidden /> Челендж місяця</p>
+          <p className="mono flex items-center gap-2 text-[12px] uppercase tracking-[0.08em] text-fg-subtle"><Trophy className="size-4 text-gold" aria-hidden /> Похід місяця</p>
           <p className="mt-4 text-[clamp(24px,2.6vw,36px)] font-medium leading-[1.15] tracking-[-0.03em]">Перші 100 відвідувачів для 10 нових зборів</p>
           <Progress value={0.34} tone="gold" className="mt-6" label="Прогрес челенджу" />
           <p className="mono mt-3 text-[11.5px] text-fg-subtle">Приклад інтерфейсу. Реальний прогрес — на сторінці спільнот.</p>

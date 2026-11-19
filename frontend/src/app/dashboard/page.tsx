@@ -52,7 +52,7 @@ function Body({ userName }: { userName: string }) {
         <LevelCard level={d.level} />
         <Card className="p-6">
           <div className="mb-4 flex items-center justify-between">
-            <p className="flex items-center gap-2 font-semibold"><Compass className="size-4 text-accent" /> Місії тижня</p>
+            <p className="flex items-center gap-2 font-semibold"><Compass className="size-4 text-accent" /> Звитяги тижня</p>
             <Badge tone="gold">+30 XP кожна</Badge>
           </div>
           <MissionList missions={d.missions} />
