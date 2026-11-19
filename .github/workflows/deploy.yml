@@ -43,6 +43,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       VISITOR_SALT: ${{ secrets.VISITOR_SALT }}
       ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
+      MONO_TOKEN_KEY: ${{ secrets.MONO_TOKEN_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -16,6 +16,8 @@ export interface Env {
   ENVIRONMENT?: string;
   /** Extra allowed origins for state-changing requests (comma-separated), e.g. http://localhost:3000 */
   ALLOWED_ORIGINS?: string;
+  /** base64 of 32 random bytes; encrypts organizers' Monobank personal tokens at rest. */
+  MONO_TOKEN_KEY?: string;
   /** Google OAuth Client ID for verifying Google ID tokens. */
   GOOGLE_CLIENT_ID?: string;
 }

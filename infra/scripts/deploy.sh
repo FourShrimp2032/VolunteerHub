@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploys Volunteerhub (API + static frontend) to Cloudflare Workers.
-# Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Optional: VISITOR_SALT, ADMIN_EMAILS.
+# Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Optional: VISITOR_SALT, ADMIN_EMAILS, MONO_TOKEN_KEY.
 # Expects frontend/out to exist (run `npm run build` in frontend/ first) and backend deps installed.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -26,7 +26,7 @@ echo "→ Deploying Worker"
 "$WRANGLER" deploy --config "$CONFIG"
 
 SECRETS=$(mktemp)
-node -e 'const o={};for(const k of ["VISITOR_SALT","ADMIN_EMAILS"]) if(process.env[k]) o[k]=process.env[k]; console.log(JSON.stringify(o))' > "$SECRETS"
+node -e 'const o={};for(const k of ["VISITOR_SALT","ADMIN_EMAILS","MONO_TOKEN_KEY"]) if(process.env[k]) o[k]=process.env[k]; console.log(JSON.stringify(o))' > "$SECRETS"
 if [ "$(cat "$SECRETS")" != "{}" ]; then
   echo "→ Updating Worker secrets"
   "$WRANGLER" secret bulk "$SECRETS" --config "$CONFIG"

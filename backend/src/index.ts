@@ -9,7 +9,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { secureHeaders } from "hono/secure-headers";
-import type { AppEnv } from "./env";
+import { getDb } from "./db/client";
+import type { AppEnv, Env } from "./env";
+import { handleWebhook, pollConnections } from "./lib/monobank-live";
 import { originGuard, sessionMiddleware } from "./lib/auth";
 import { CATEGORIES } from "./lib/constants";
 import { ACHIEVEMENTS, LEVELS, XP_RULES } from "./lib/gamification";
@@ -73,6 +75,13 @@ const api = new Hono<AppEnv>()
   .route("/communities", communityRoutes)
   .route("/challenges", challengeRoutes)
   .route("/admin", adminRoutes)
+  // Monobank webhook (see lib/monobank-live.ts). GET is Monobank's URL check and must answer 200.
+  .get("/monobank/webhook/:secret", (c) => c.text("ok"))
+  .post("/monobank/webhook/:secret", async (c) => {
+    const payload = await c.req.json().catch(() => null);
+    const known = await handleWebhook(getDb(c.env.DB), c.req.param("secret"), payload);
+    return known ? c.text("ok") : c.text("unknown", 404);
+  })
   .notFound((c) => c.json({ error: "Не знайдено." }, 404));
 
 const app = new Hono<AppEnv>();
@@ -110,5 +119,11 @@ app.all("*", async (c) => {
   return c.env.ASSETS.fetch(c.req.raw);
 });
 
-export default app;
+export default {
+  fetch: app.fetch,
+  /** Cron (see infra/cloudflare/wrangler.toml): fallback poll of connected Monobank jars. */
+  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
+    ctx.waitUntil(pollConnections(getDb(env.DB), env).then((r) => console.log("monobank poll", r)));
+  },
+};
 export type ApiType = typeof api;

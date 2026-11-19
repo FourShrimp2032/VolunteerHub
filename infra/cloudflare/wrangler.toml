@@ -38,5 +38,9 @@ migrations_dir = "../../backend/migrations"
 # binding = "UPLOADS"
 # bucket_name = "volunteerhub-uploads"
 
+# Pull fresh balances from Monobank jars (see backend/src/lib/jar-sync.ts).
+[triggers]
+crons = ["*/5 * * * *"]
+
 [observability]
 enabled = true

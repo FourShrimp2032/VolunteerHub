@@ -77,8 +77,8 @@ export function toCard(c: Campaign, org: User | null, extra: { hasFinalReport: b
     goalAmount: c.goalAmount,
     raisedAmount: c.raisedAmount,
     raisedUpdatedAt: c.raisedUpdatedAt,
-    /** Amounts are always organizer-reported: there is no official Monobank balance API. */
-    raisedSource: "organizer_reported" as const,
+    /** "monobank_jar" when read from the jar's public page, otherwise typed in by the organizer. */
+    raisedSource: c.raisedSource === "jar" ? ("monobank_jar" as const) : ("organizer_reported" as const),
     progress: progressOf(c),
     deadline: c.deadline,
     urgent: c.urgent,

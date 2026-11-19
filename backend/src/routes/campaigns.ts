@@ -29,6 +29,8 @@ import { parseJarUrl } from "../lib/monobank";
 import { campaignCards, fileUrl, loadCampaignBySlugOrId, publicUser, toCard, verificationOf } from "../lib/serialize";
 import { dayKey, newId, parseJsonArray, randomToken, sha256Hex, slugify } from "../lib/util";
 import { body } from "../lib/validate";
+import { connectCampaign, connectionStatus, disconnectCampaign, MonoError } from "../lib/monobank-live";
+import { monobankConnections } from "../db/schema";
 
 const budgetSchema = z.array(z.object({ label: z.string().trim().min(1, "Вкажіть назву статті бюджету").max(120), amount: z.number().int().min(0).max(1_000_000_000) })).max(30);
 
@@ -116,13 +118,21 @@ async function applyDraft(db: DB, user: User, id: string, input: z.infer<typeof 
     if (input.jarUrl) {
       const jar = parseJarUrl(input.jarUrl);
       if (!jar.ok) throw new HTTPException(400, { message: jar.error });
-      if (current?.jarUrl !== jar.url) patch.destinationVerifiedAt = null; // a changed destination must be re-verified
+      if (current?.jarUrl !== jar.url) {
+        patch.destinationVerifiedAt = null; // a changed destination must be re-verified
+        patch.monoConnectionId = null; // and re-connected to Monobank
+        patch.monoJarAccount = null;
+        patch.raisedSource = "organizer";
+      }
       patch.jarUrl = jar.url;
       patch.jarId = jar.jarId;
     } else {
       patch.jarUrl = null;
       patch.jarId = null;
       patch.destinationVerifiedAt = null;
+      patch.monoConnectionId = null;
+      patch.monoJarAccount = null;
+      patch.raisedSource = "organizer";
     }
   }
   await db.update(campaigns).set(patch).where(eq(campaigns.id, id));
@@ -485,13 +495,39 @@ export const campaignRoutes = new Hono<AppEnv>()
     const { db, campaign } = await ownCampaign(c, c.req.param("id"));
     if (!["active", "goal_reached"].includes(campaign.status)) return c.json({ error: "Прогрес можна оновлювати лише для активного збору." }, 400);
     const input = await body(c, z.object({ raisedAmount: z.number().int().min(0).max(1_000_000_000) }));
-    const patch: Partial<Campaign> = { raisedAmount: input.raisedAmount, raisedUpdatedAt: Date.now(), updatedAt: Date.now() };
+    // Manual fallback for campaigns not connected to Monobank (a connected jar's events keep raising it).
+    const patch: Partial<Campaign> = { raisedAmount: input.raisedAmount, raisedUpdatedAt: Date.now(), raisedSource: "organizer", updatedAt: Date.now() };
     if (campaign.goalAmount > 0 && input.raisedAmount >= campaign.goalAmount && campaign.status === "active") {
       patch.status = "goal_reached";
       patch.goalReachedAt = Date.now();
     }
     await db.update(campaigns).set(patch).where(eq(campaigns.id, campaign.id));
     return c.json({ ok: true, status: patch.status ?? campaign.status });
+  })
+  // ------------------------------------------------ Monobank live totals
+  .get("/:id/monobank", async (c) => {
+    const { db, campaign } = await ownCampaign(c, c.req.param("id"));
+    const [conn] = campaign.monoConnectionId ? await db.select().from(monobankConnections).where(eq(monobankConnections.id, campaign.monoConnectionId)).limit(1) : [];
+    return c.json(connectionStatus(campaign, conn));
+  })
+  .post("/:id/monobank", async (c) => {
+    const { db, user, campaign } = await ownCampaign(c, c.req.param("id"));
+    if (campaign.organizerId !== user.id) return c.json({ error: "Підключити Monobank може лише організатор збору." }, 403);
+    if (!["draft", "pending", "active", "goal_reached"].includes(campaign.status)) return c.json({ error: "Цей збір уже не можна підключити." }, 400);
+    if (!(await rateLimit(db, `mono:${user.id}`, 6, 60 * 60 * 1000))) return c.json({ error: "Забагато спроб. Спробуйте пізніше." }, 429);
+    const input = await body(c, z.object({ token: z.string().trim().min(1, "Вставте токен.").max(200) }));
+    try {
+      const r = await connectCampaign(db, c.env, { userId: user.id, camp: campaign, token: input.token, origin: new URL(c.req.url).origin });
+      return c.json({ ok: true, ...r });
+    } catch (e) {
+      if (e instanceof MonoError) return c.json({ error: e.message }, e.status as 400);
+      throw e;
+    }
+  })
+  .delete("/:id/monobank", async (c) => {
+    const { db, campaign } = await ownCampaign(c, c.req.param("id"));
+    await disconnectCampaign(db, c.env, campaign);
+    return c.json({ ok: true });
   })
   .post("/:id/complete", async (c) => {
     const { db, campaign } = await ownCampaign(c, c.req.param("id"));

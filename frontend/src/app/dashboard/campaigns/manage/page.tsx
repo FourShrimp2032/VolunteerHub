@@ -127,7 +127,8 @@ function Manage({ id }: { id: string }) {
         </section>
       )}
 
-      {["active", "goal_reached"].includes(c.status) && <ProgressForm c={c} onDone={load} />}
+      {c.hasJar && !c.isDemo && ["draft", "pending", "active", "goal_reached"].includes(c.status) && <MonobankCard c={c} onDone={load} />}
+      {["active", "goal_reached"].includes(c.status) && c.raisedSource !== "monobank_jar" && <ProgressForm c={c} onDone={load} />}
       {live && <UpdateForm c={c} onDone={load} />}
 
       {live && c.status !== "completed" && (
@@ -184,6 +185,108 @@ function ViewsChart({ days }: { days: Stats["days"] }) {
   );
 }
 
+type MonoStatus = { connected: boolean; clientName?: string; webhookActive?: boolean; lastEventAt?: number | null; lastSyncAt?: number | null; lastError?: string | null };
+
+/** Connects the campaign's jar to the official Monobank personal API so the total updates by itself. */
+function MonobankCard({ c, onDone }: { c: CampaignDetail; onDone: () => void }) {
+  const [st, setSt] = React.useState<MonoStatus | null>(null);
+  const [token, setToken] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState<string | null>(null);
+  const toast = useToast();
+  const refresh = React.useCallback(() => {
+    api<MonoStatus>(`/campaigns/${c.id}/monobank`).then(setSt).catch(() => setSt({ connected: false }));
+  }, [c.id]);
+  React.useEffect(refresh, [refresh]);
+
+  if (!st) return <Skeleton className="h-40 rounded-2xl" />;
+
+  if (st.connected)
+    return (
+      <Card className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="flex items-center gap-2 font-semibold"><span className="pulse" aria-hidden /> Сума оновлюється з Monobank</p>
+            <p className="mt-1 text-sm text-fg-muted">
+              Банку підключено{st.clientName ? ` (${st.clientName})` : ""}. Кожне поповнення зараховується за кілька секунд, донори бачать позначку «Наживо з банки Monobank».
+            </p>
+            <p className="mono mt-3 text-[12px] text-fg-subtle">
+              {st.webhookActive ? "Миттєві оновлення увімкнено" : "Миттєві оновлення недоступні, сума оновлюється раз на кілька хвилин"}
+              {st.lastEventAt ? ` · остання подія ${timeAgo(st.lastEventAt)}` : ""}
+              {c.raisedUpdatedAt ? ` · сума оновлена ${timeAgo(c.raisedUpdatedAt)}` : ""}
+            </p>
+            {st.lastError && <Alert tone="warning" className="mt-3">{st.lastError}</Alert>}
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await api(`/campaigns/${c.id}/monobank`, { method: "DELETE" });
+                toast({ kind: "success", title: "Monobank відключено", description: "Токен видалено з Volunteerhub." });
+                refresh();
+                onDone();
+              } catch (e) {
+                toast({ kind: "error", title: (e as Error).message });
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Відключити
+          </Button>
+        </div>
+      </Card>
+    );
+
+  return (
+    <Card className="p-5 sm:p-6">
+      <p className="font-semibold">Показувати суму з банки автоматично</p>
+      <p className="mt-1 max-w-2xl text-sm leading-relaxed text-fg-muted">
+        Підключіть офіційний API Monobank, і зібрана сума оновлюватиметься сама після кожного донату. Це також підтверджує, що банка належить вам.
+      </p>
+      <ol className="mt-4 grid gap-1.5 text-sm text-fg-muted">
+        <li><span className="mono mr-2 text-accent">01</span>Відкрийте <a href="https://api.monobank.ua/" target="_blank" rel="noreferrer noopener" className="link-u text-fg">api.monobank.ua</a> і увійдіть через застосунок Monobank.</li>
+        <li><span className="mono mr-2 text-accent">02</span>Скопіюйте персональний токен <b className="font-medium text-fg">того акаунта, якому належить банка</b>.</li>
+        <li><span className="mono mr-2 text-accent">03</span>Вставте його нижче.</li>
+      </ol>
+      <form
+        className="mt-5 flex flex-col gap-2 sm:flex-row"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          setErr(null);
+          try {
+            const r = await api<{ balance: number; jarTitle: string; webhookActive: boolean; previousWebhook: string | null }>(`/campaigns/${c.id}/monobank`, { method: "POST", json: { token } });
+            setToken("");
+            toast({
+              kind: "success",
+              title: `Банку «${r.jarTitle}» підключено`,
+              description: r.webhookActive ? `Зараз на банці ${money(r.balance)}. Нові донати з'являтимуться за секунди.` : `Зараз на банці ${money(r.balance)}. Сума оновлюватиметься раз на кілька хвилин.`,
+            });
+            refresh();
+            onDone();
+          } catch (er) {
+            setErr((er as Error).message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <Input type="password" autoComplete="off" spellCheck={false} value={token} onChange={(e) => setToken(e.target.value)} placeholder="Токен з api.monobank.ua" aria-label="Токен Monobank" className="sm:max-w-md" />
+        <Button type="submit" loading={busy} disabled={!token.trim()}>Підключити</Button>
+      </form>
+      {err && <Alert tone="danger" className="mt-3">{err}</Alert>}
+      <Alert tone="neutral" icon={<Info />} className="mt-4">
+        Токен дає доступ лише на читання. Ми зберігаємо його зашифрованим і використовуємо тільки для балансу цієї банки: інші рахунки й виписки не показуємо й не зберігаємо.
+        Monobank дозволяє один вебхук на акаунт, тож якщо інший сервіс уже отримує ваші події, він перестане. Відкликати доступ можна будь-коли на api.monobank.ua.
+      </Alert>
+    </Card>
+  );
+}
+
 function ProgressForm({ c, onDone }: { c: CampaignDetail; onDone: () => void }) {
   const [v, setV] = React.useState(String(c.raisedAmount || ""));
   const [busy, setBusy] = React.useState(false);
@@ -195,7 +298,7 @@ function ProgressForm({ c, onDone }: { c: CampaignDetail; onDone: () => void }) 
         <div className="flex-1">
           <p className="font-semibold">Оновити зібрану суму</p>
           <p className="mt-1 text-sm text-fg-muted">
-            Monobank не надає офіційного API для балансу банки, тому вкажіть суму вручну. Донори бачитимуть її з позначкою «за даними організатора».
+            Підключіть Monobank вище, щоб сума оновлювалась сама. Або вкажіть її вручну: донори бачитимуть позначку «за даними організатора».
           </p>
           <div className="mt-4 flex items-center gap-3">
             <Progress value={c.goalAmount ? amount / c.goalAmount : 0} className="max-w-sm" />
