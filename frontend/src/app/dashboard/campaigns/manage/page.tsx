@@ -245,7 +245,7 @@ function MonobankCard({ c, onDone }: { c: CampaignDetail; onDone: () => void }) 
     <Card className="p-5 sm:p-6">
       <p className="font-semibold">Показувати суму з банки автоматично</p>
       <p className="mt-1 max-w-2xl text-sm leading-relaxed text-fg-muted">
-        Підключіть офіційний API Monobank, і зібрана сума оновлюватиметься сама після кожного донату. Це також підтверджує, що банка належить вам.
+        Без підключення сума оновлюється з банки кожні кілька хвилин. Підключіть офіційний API Monobank, і кожен донат з'являтиметься за секунди. Це також підтверджує, що банка належить вам.
       </p>
       <ol className="mt-4 grid gap-1.5 text-sm text-fg-muted">
         <li><span className="mono mr-2 text-accent">01</span>Відкрийте <a href="https://api.monobank.ua/" target="_blank" rel="noreferrer noopener" className="link-u text-fg">api.monobank.ua</a> і увійдіть через застосунок Monobank.</li>
@@ -298,7 +298,9 @@ function ProgressForm({ c, onDone }: { c: CampaignDetail; onDone: () => void }) 
         <div className="flex-1">
           <p className="font-semibold">Оновити зібрану суму</p>
           <p className="mt-1 text-sm text-fg-muted">
-            Підключіть Monobank вище, щоб сума оновлювалась сама. Або вкажіть її вручну: донори бачитимуть позначку «за даними організатора».
+            {c.raisedSource === "monobank_public"
+              ? "Сума вже оновлюється з банки кожні кілька хвилин. Підключіть Monobank вище, щоб донати з'являлися миттєво. Ручне значення потрібне, лише якщо банка недоступна."
+              : "Після публікації сума оновлюватиметься з банки кожні кілька хвилин, а з підключеним Monobank вище — миттєво. Можна також вказати її вручну: донори бачитимуть позначку «за даними організатора»."}
           </p>
           <div className="mt-4 flex items-center gap-3">
             <Progress value={c.goalAmount ? amount / c.goalAmount : 0} className="max-w-sm" />

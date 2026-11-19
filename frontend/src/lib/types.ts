@@ -12,7 +12,7 @@ export type Verification = { identityReviewed: boolean; purposeReviewed: boolean
 
 export type CampaignCard = {
   id: string; slug: string; title: string; summary: string; category: string; city: string; coverUrl: string | null;
-  goalAmount: number; raisedAmount: number; raisedUpdatedAt: number | null; raisedSource: "organizer_reported" | "monobank_jar"; progress: number;
+  goalAmount: number; raisedAmount: number; raisedUpdatedAt: number | null; raisedSource: "organizer_reported" | "monobank_jar" | "monobank_public"; progress: number;
   deadline: number | null; urgent: boolean; status: string; isDemo: boolean; publishedAt: number | null; createdAt: number;
   viewCount: number; followers: number; verification: Verification; reasons?: string[];
   organizer: { id: string; name: string; avatarUrl: string | null; identityVerified: boolean; isDemo: boolean } | null;

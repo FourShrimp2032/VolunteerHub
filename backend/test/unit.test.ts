@@ -3,6 +3,7 @@ import { OAuth2Client } from "google-auth-library";
 import { buildSections, scoreCampaign } from "../src/lib/discovery";
 import { levelForXp } from "../src/lib/gamification";
 import { parseJarUrl } from "../src/lib/monobank";
+import { canPollPublic, parsePublicJar } from "../src/lib/monobank-public";
 import { decryptToken, encryptToken, parseClientInfo, parseWebhookEvent, sendIdToJarId } from "../src/lib/monobank-live";
 import { sniffMime } from "../src/lib/storage";
 import { slugify } from "../src/lib/util";
@@ -57,6 +58,30 @@ describe("monobank personal API", () => {
     expect(enc).not.toContain("secret");
     expect(await decryptToken(env, enc)).toBe("uXyz-secret-token-1234567890");
     await expect(encryptToken({ DB: undefined as never, ENVIRONMENT: "production" }, "t")).rejects.toThrow();
+  });
+});
+
+describe("token-less jar polling", () => {
+  it("reads the public jar response (kopecks → hryvnias)", () => {
+    // Shape returned by send.monobank.ua/api/handler for a real jar.
+    expect(parsePublicJar({ clientType: "jar", jarAmount: 1001, jarGoal: 1000000, jarStatus: "ACTIVE" })).toEqual({ balance: 10, status: "ACTIVE" });
+    expect(parsePublicJar({ clientType: "jar", jarAmount: 0 })).toEqual({ balance: 0, status: "UNKNOWN" });
+  });
+  it("rejects anything that isn't a jar balance", () => {
+    expect(parsePublicJar(null)).toBeNull();
+    expect(parsePublicJar({ errCode: "NOT_FOUND" })).toBeNull();
+    expect(parsePublicJar({ clientType: "personal", jarAmount: 500 })).toBeNull();
+    expect(parsePublicJar({ clientType: "jar", jarAmount: -5 })).toBeNull();
+    expect(parsePublicJar({ clientType: "jar", jarAmount: "100" })).toBeNull();
+  });
+  it("polls only published, non-demo jars that aren't connected with a token", () => {
+    const base = { jarId: "z6PK8H4hU", isDemo: false, status: "active", monoConnectionId: null };
+    expect(canPollPublic(base)).toBe(true);
+    expect(canPollPublic({ ...base, status: "goal_reached" })).toBe(true);
+    expect(canPollPublic({ ...base, monoConnectionId: "mc_1" })).toBe(false);
+    expect(canPollPublic({ ...base, isDemo: true })).toBe(false);
+    expect(canPollPublic({ ...base, status: "pending" })).toBe(false);
+    expect(canPollPublic({ ...base, jarId: null })).toBe(false);
   });
 });
 
