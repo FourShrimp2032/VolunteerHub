@@ -216,7 +216,7 @@ bash infra/scripts/deploy.sh
 
 ## User feedback
 
-Full results of the user testing are in [Volunteer_Report.pdf](Volunteer_Report.pdf) (section 6, "Prototype User Testing").
+Full results of the user testing are in [Volunteerhub_Report.pdf](Volunteerhub_Report.pdf) (section 6, "Prototype User Testing").
 
 **Summary.** We tested the live prototype with 6 members of Plast (aged 16–20, mostly students, friends of a team member). All of them donate regularly and use Monobank. Everyone opened the site (4 on desktop, 2 on mobile) and explored it without any guidance. Participants understood what the platform is for, noticed that donations go straight to the organizer's Monobank Jar and not through us, found campaigns easily thanks to the categories, and worked out how to add Jars and create campaigns on their own.
 
