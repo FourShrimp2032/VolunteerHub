@@ -1,6 +1,6 @@
 # Volunteerhub
 
-**Volunteerhub** is a Ukrainian platform that connects fundraisers (volunteers and organizers) with people who want to support them. Supporters can discover campaigns, check them, and see what happened to the money afterwards.
+**Volunteerhub** is a Ukrainian platform that connects fundraisers (volunteers and organizers) with people who want to support them. Supporters can discover campaigns, check them, and see what happened to the money afterwards. Supporters can also open their own **sub-jars** under a campaign they like, to rally friends around it.
 
 > Mission: make every important fundraiser visible, trustworthy and accessible, regardless of who started it.
 
@@ -36,7 +36,7 @@ A modern web app (UI in Ukrainian) where:
 - **Organizer dashboard:** my campaigns, stats (unique views per day, followers, shares, referred visitors, clicks to the jar), progress updates, updates/purchases/final reports with receipts, attachments.
 - **Supporter dashboard:** followed and saved campaigns, recent updates, personal impact stats, level, XP history, weekly missions, achievements, communities and challenges.
 - **Trust:** identity verification via a **private** document upload (owner and admins only), purpose review on approval, jar verification by a moderator, and a "report submitted" badge. Content reports.
-- **Gamification:** Impact XP with a unique ledger, so the same action can't be farmed. Five levels (Explorer → Impact Leader), 8 achievements, weekly missions, community and platform challenges, and monthly leaderboards based on participation, never money.
+- **Gamification:** Impact XP with a unique ledger, so the same action can't be farmed. Five levels with Cossack-themed titles, 8 achievements, weekly missions, community and platform challenges, and monthly leaderboards based on participation, never money.
 - **Admin dashboard:** moderation queue (approve/reject with reason), jar verification, identity verification requests, reported campaigns, user management (roles, blocking).
 - **Monetization structure:** Free / Pro (799 ₴, experimental) / Corporate plans. A `users.plan` column exists for future gating. Billing is intentionally **not** implemented. Plans never affect ranking or badges.
 - **Demo data:** 12 fictional campaigns, 5 organizers and 3 communities, all marked **«Демо»**. Demo organizers can't sign in, demo campaigns have no jar and carry no verification badges.
@@ -216,4 +216,8 @@ bash infra/scripts/deploy.sh
 
 ## User feedback
 
-The testing kit and report template are in [`docs/user-feedback-report.md`](docs/user-feedback-report.md). No user testing has been done yet.
+Full results of the user testing are in [dVolunteer_Report.pdf](Volunteer_Report.pdf) (section 6, "Prototype User Testing").
+
+**Summary.** We tested the live prototype with 6 members of Plast (aged 16–20, mostly students, friends of a team member). All of them donate regularly and use Monobank. Everyone opened the site (4 on desktop, 2 on mobile) and explored it without any guidance. Participants understood what the platform is for, noticed that donations go straight to the organizer's Monobank Jar and not through us, found campaigns easily thanks to the categories, and worked out how to add Jars and create campaigns on their own.
+
+**What we changed.** The only remark concerned gamification: the supporter titles felt dull. We replaced them with Cossack-themed titles earned through Impact XP. The earlier survey (2 of 6 respondents give via friends' auxiliary Jars) is the use case behind our new sub-jar feature.
